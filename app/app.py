@@ -6,47 +6,145 @@ DEFAULT_HEADERS = {
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
 }
 
+COLLAPSE_OPTIONS = {
+    "hour": "10",
+    "day": "8",
+    "month": "6",
+    "year": "4",
+}
+
 # NOTE: All of these are proof of concept tests and are WIP.
 
 
-def scrape_websites(urls):
-    """Takes array of urls and scrapes each webpage for GA and UA codes.
+def get_analytics_codes(
+    urls,
+    start_date="20121001000000",
+    end_date=None,
+    frequency=None,
+    limit=None,
+):
+    """Takes array of urls and returns array of dictionaries with all found analytics codes for a given time range.
+    If no time range is given, returns all analytics codes for each url.
+
+    Args:
+        urls (array): Array of urls to scrape.
+        start_date (str, optional): Start date for time range. Defaults to Oct 1, 2012, when UA codes were adopted.
+        end_date (str, optional): End date for time range. Defaults to None.
+        frequency (str, optional): Can limit snapshots to remove duplicates (1 per hr, day, month, etc). Defaults to None.
+        limit (int, optional): Limit number of snapshots returned. Defaults to None.
+        direction (str, optional): Determines whether to start looking for UA codes from earliest snapshot or most recent. Defaults to "asc".
 
     Returns:
-        Array of dictionaries for each url:
-            {
-                "title": "Page Title",
-                "url": "https://www.example.com",
-                "UA_codes": ["UA-12345678-1", "UA-12345678-2"], # duplicates removed
-                "GA_codes": ["G-1234567890"], # duplicates removed
-                "html": "<html>...</html>" # optional
+        {
+            "someurl.com": {
+                "current_UA_code": "UA-12345678-1",
+                "current_GA_code": "G-1234567890",
+                "archived_UA_codes": {
+                    "UA-12345678-1": ["20190101000000", "20190102000000", ...],
+                    "UA-12345678-2": ["20190101000000", "20190102000000", ...],
+                },
+                "archived_GA_codes": {
+                    "G-1234567890": ["20190101000000", "20190102000000", ...],
+                },
             }
-
+        }
     """
-
+    # initialize results array
     results = []
+
+    # Get data for each url:
     for url in urls:
+        # add step to format URLs with a given scheme if not already present???
+        curr_entry = {url: {}}
         html = get_html(url)
         if html:
-            UA_codes = get_UA_code(html)
-            GA_codes = get_GA_code(html)
-            title = get_page_title(html)
-            results.append(
-                {
-                    "title": title,
-                    "url": url,
-                    "UA_codes": UA_codes,
-                    "GA_codes": GA_codes,
-                    # "html": html,
-                }
-            )
+            curr_entry["current_UA_code"] = get_UA_code(html)
+            curr_entry["current_GA_code"] = get_GA_code(html)
+            curr_entry["title"] = get_page_title(html)
+
+        # get all archived UA_codes and GA codes
+
+        # get snapshot timestamps
+        snapshot_timestamps = get_snapshot_timestamps(
+            url=url,
+            start_date=start_date,
+            end_date=end_date,
+            frequency=frequency,
+            limit=limit,
+        )
+
+        # visit each snapshot to get codes
+
+        results.append(curr_entry)
 
     return results
 
 
+def get_snapshot_timestamps(
+    url,
+    start_date="20121001000000",
+    end_date=None,
+    frequency=None,
+    limit=None,
+):
+    """Takes a url and returns an array of snapshot timestamps for a given time range.
+
+    Args:
+        url (str)
+        start_date (str, optional): Start date for time range. Defaults to Oct 1, 2012, when UA codes were adopted.
+        end_date (str, optional): End date for time range. Defaults to None.
+        frequency (str, optional): Can limit snapshots to remove duplicates (1 per hr, day, week, etc). Defaults to None.
+        limit (int, optional): Limit number of snapshots returned. Defaults to None.
+        direction (str, optional): Determines whether to start looking for UA codes from earliest snapshot or most recent. Defaults to "asc".
+
+    Returns:
+        Array of timestamps:
+            ["20190101000000", "20190102000000", ...]
+
+    NOTE: The CDX params are a bit finnicky. It may be best to return a larger number of timestamps and then filter out the
+    ones we don't need. That would lead to longer load times, however. Main issues include:
+
+    - 'frequency' often breaks with other params. It is most reliable when paired with an exact limit (if getting years
+    since 2012, add a limit of 11 results)
+    - 'limit' breaks with frequency and start date if inverted to get most recent snapshots first.
+    """
+
+    # Default params get snapshots from url domain w/ 200 status codes only.
+    cdx_url = f"http://web.archive.org/cdx/search/cdx?url={url}&matchType=domain&filter=statuscode:200&output=JSON"
+
+    if frequency:
+        cdx_url += f"&collapse=timestamp:{frequency}"
+
+    if limit:
+        cdx_url += f"&limit={limit}"
+
+    if start_date:
+        cdx_url += f"&from={start_date}"
+
+    if start_date and end_date:
+        cdx_url += f"&to={end_date}"
+
+    print("CDX url= ", cdx_url)
+
+    # Regex pattern to find 14-digit timestamps
+    pattern = re.compile(r"\d{14}")
+
+    # Get snapshots for each url
+    response = requests.get(
+        url=cdx_url,
+        headers=DEFAULT_HEADERS,
+    )
+    timestamps = pattern.findall(response.text)
+
+    # Return sorted timestamps
+    return sorted(timestamps)
+
+
 def get_html(url):
     """Returns raw html from given url."""
+
     try:
+        print(url)
         response = requests.get(url, headers=DEFAULT_HEADERS, timeout=10)
     except Exception as e:
         print(e)
@@ -106,33 +204,33 @@ def get_page_title(html):
     return title
 
 
-def get_snapshots(urls):
-    """Takes array of urls and returns array of archived snapshots from Internet Archive's
-    CDX API.
+# def get_snapshots(urls):
+#     """Takes array of urls and returns array of archived snapshots from Internet Archive's
+#     CDX API.
 
-    Returns:
-        {
-            "someurl.com": ["20190101000000", "20190102000000", ...],
-            "anotherurl.com": ["20190101000000", "20190102000000", ...],
-            ...
-        }
-    """
+#     Returns:
+#         {
+#             "someurl.com": ["20190101000000", "20190102000000", ...],
+#             "anotherurl.com": ["20190101000000", "20190102000000", ...],
+#             ...
+#         }
+#     """
 
-    results = []
+#     results = []
 
-    # Regex pattern to find 14-digit timestamps
-    pattern = re.compile(r'\d{14}')
+#     # Regex pattern to find 14-digit timestamps
+#     pattern = re.compile(r"\d{14}")
 
-    # Get snapshots for each url
-    for url in urls:
-        response = requests.get(
-            url=f"http://web.archive.org/cdx/search/cdx?url={url}&output=JSON",
-            headers=DEFAULT_HEADERS,
-        )
-        timestamps = pattern.findall(response.text)
+#     # Get snapshots for each url
+#     for url in urls:
+#         response = requests.get(
+#             url=f"http://web.archive.org/cdx/search/cdx?url={url}&matchType=domain&output=JSON",
+#             headers=DEFAULT_HEADERS,
+#         )
+#         timestamps = pattern.findall(response.text)
 
-        # Create dictionary for each url and add to results
-        url_data = { url: timestamps}
-        results.append(url_data)
+#         # Create dictionary for each url and add to results
+#         url_data = {url: timestamps}
+#         results.append(url_data)
 
-    return results
+#     return results

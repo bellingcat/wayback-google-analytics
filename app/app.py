@@ -106,17 +106,33 @@ def get_page_title(html):
     return title
 
 
-def find_archived_urls(urls):
+def get_snapshots(urls):
     """Takes array of urls and returns array of archived snapshots from Internet Archive's
     CDX API.
+
+    Returns:
+        {
+            "someurl.com": ["20190101000000", "20190102000000", ...],
+            "anotherurl.com": ["20190101000000", "20190102000000", ...],
+            ...
+        }
     """
 
     results = []
+
+    # Regex pattern to find 14-digit timestamps
+    pattern = re.compile(r'\d{14}')
+
+    # Get snapshots for each url
     for url in urls:
         response = requests.get(
             url=f"http://web.archive.org/cdx/search/cdx?url={url}&output=JSON",
             headers=DEFAULT_HEADERS,
         )
-        results.append(response)
+        timestamps = pattern.findall(response.text)
+
+        # Create dictionary for each url and add to results
+        url_data = { url: timestamps}
+        results.append(url_data)
 
     return results

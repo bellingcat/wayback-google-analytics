@@ -48,7 +48,10 @@ def get_analytics_codes(
                 },
             }
         }
+
+    TODO: Currently doesn't include GTM-ids.
     """
+
     # initialize results array
     results = []
 
@@ -74,6 +77,9 @@ def get_analytics_codes(
         )
 
         # visit each snapshot to get codes
+        archived_codes = get_codes_from_snapshots(url=url, timestamps=snapshot_timestamps)
+        curr_entry["archived_UA_codes"] = archived_codes["UA_codes"]
+        curr_entry["archived_GA_codes"] = archived_codes["GA_codes"]
 
         results.append(curr_entry)
 
@@ -140,12 +146,78 @@ def get_snapshot_timestamps(
     return sorted(timestamps)
 
 
+def get_codes_from_snapshots(url, timestamps):
+    """Takes a url and array of snapshot timestamps and returns a dictionary of UA/GA codes.
+
+    Args:
+        url (str)
+        timestamps (array): Array of snapshot timestamps.
+
+    Returns:
+        {
+            "UA_codes": {
+                "UA-12345678-1": {
+                    "first_seen": "20190101000000",
+                    "last_seen": "20190102000000",
+                },
+            },
+            "GA_codes: {
+                "G-1234567890": {
+                    "first_seen": "20190101000000",
+                    "last_seen": "20190102000000",
+                },
+            },
+        }
+    """
+
+    # build base url template for wayback machine
+    base_url = "https://web.archive.org/web/{timestamp}/" + url
+
+    # initialize results dictionary
+    results = {
+        "UA_codes": {},
+        "GA_codes": {},
+    }
+
+    # get codes from each snapshot
+    for timestamp in timestamps:
+        # format url and get raw html
+        curr_url = base_url.format(timestamp=timestamp)
+        html = get_html(curr_url)
+
+        if html:
+            UA_codes = get_UA_code(html)
+            GA_codes = get_GA_code(html)
+
+            # above functions return lists, so iterate thru codes and update
+            # results dict
+            for code in UA_codes:
+                if code not in results["UA_codes"]:
+                    results["UA_codes"][code] = {}
+                    results["UA_codes"][code]["first_seen"] = timestamp
+                    results["UA_codes"][code]["last_seen"] = timestamp
+
+                if code in results["UA_codes"]:
+                    results["UA_codes"][code]["last_seen"] = timestamp
+
+            for code in GA_codes:
+                if code not in results["GA_codes"]:
+                    results["GA_codes"][code] = {}
+                    results["GA_codes"][code]["first_seen"] = timestamp
+                    results["GA_codes"][code]["last_seen"] = timestamp
+
+                if code in results["GA_codes"]:
+                    results["GA_codes"][code]["last_seen"] = timestamp
+
+    return results
+
+
 def get_html(url):
     """Returns raw html from given url."""
 
     try:
         print(url)
-        response = requests.get(url, headers=DEFAULT_HEADERS, timeout=10)
+        response = requests.get(url, headers=DEFAULT_HEADERS, timeout=60)
     except Exception as e:
         print(e)
         return None
@@ -202,35 +274,3 @@ def get_page_title(html):
         return None
 
     return title
-
-
-# def get_snapshots(urls):
-#     """Takes array of urls and returns array of archived snapshots from Internet Archive's
-#     CDX API.
-
-#     Returns:
-#         {
-#             "someurl.com": ["20190101000000", "20190102000000", ...],
-#             "anotherurl.com": ["20190101000000", "20190102000000", ...],
-#             ...
-#         }
-#     """
-
-#     results = []
-
-#     # Regex pattern to find 14-digit timestamps
-#     pattern = re.compile(r"\d{14}")
-
-#     # Get snapshots for each url
-#     for url in urls:
-#         response = requests.get(
-#             url=f"http://web.archive.org/cdx/search/cdx?url={url}&matchType=domain&output=JSON",
-#             headers=DEFAULT_HEADERS,
-#         )
-#         timestamps = pattern.findall(response.text)
-
-#         # Create dictionary for each url and add to results
-#         url_data = {url: timestamps}
-#         results.append(url_data)
-
-#     return results

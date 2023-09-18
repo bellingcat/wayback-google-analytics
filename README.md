@@ -1,76 +1,29 @@
-# Phase 1:
+# Overview
 
-## Scrape websites for their google analytics codes
+This is a collection of WIP, proof-of-concept scripts for a small tool that gathers current and historic
+Google analytics data (UA and GA codes) from a collection of website urls. UA codes are a particularly
+useful data point for OSINT investigators (see: [https://www.bellingcat.com/resources/how-tos/2015/07/23/unveiling-hidden-connections-with-google-analytics-ids/]), but they're being phased out in Google's GA4.
 
-- Function should take array of urls
-- Should iterate over them and scrape their html (bs4) and then find their google analytics code. Should take that analytics code and put it into a dictionary that looks like this.
+Luckily, the Internet Archive's Wayback Machine allows us to look back and find older codes. This tool finds
+Wayback snapshots using the CDX API and then returns a dictionary of current and previous codes. The output looks
+like:
 
-```
-[
+```json
     {
-        title: "Webpage title",
-        url: "www.webpage.com",
-        UA-code: UA-XXXXXXX (NULL if non-existent)
-        GA-code: GA-XXXXXXX (NULL if non-existent)
+        "someurl.com": {
+            "current_UA_code": "",
+            "current_GA_code": "G-1234567890",
+            "archived_UA_codes": {
+                "UA-12345678-1": ["20190101000000", "20190102000000", ...],
+                "UA-12345678-2": ["20190101000000", "20190102000000", ...],
+            },
+            "archived_GA_codes": {
+                "G-1234567890": ["20190101000000", "20190102000000", ...],
+            },
+        },
+        ...
     }
-]
-```
-
-### BIG QUESTIONS FOR PHASE 1:
-- Do I need a setting to determine whether or not we should get archival data on the first pass?
-
-# Phase 2:
-
-## Use wayback machine API to get older versions and use their data.
-
-- After the initial run-through, we circle back to look for older websites that may contain that UA code.
-- Function iterates over earlier dictionaries. If we don't have a UA code, we should use the wayback machine starting from most recent to least recent until we find a UA code.
-- Dictionary should be updated to look like this
 
 ```
-[
-    {
-        title: "Webpage title",
-        url: "www.webpage.com",
-        UA-code: UA-XXXXXXX (NULL if non-existent)
-        GA-code: GA-XXXXXXX (NULL if non-existent)
-        archived_urls: {
-            [
-                url1, url2, etc...
-            ]
-        }
-        archived_ua_codes: {
-            [
-                {
-                    UA-code: UA-XXXXXX,
-                    date: 11/11/11,
-                    url: ...
-                }
-            ]
-        }
-    }
-]
-```
 
-### BIG QUESTIONS FOR PHASE 2
-
-- A codes rolled out in 2012 and were discontinued in 2023. Time range should start in 2012, but we can continue til today due to presence of legacy codes.
-- Wayback CDX API does a good job of responding quickly to calls, but some have 100s of snapshots. What is a good way to scrape and get codes w/o having to overload the CDX API with needless calls?
-    - Maybe an interval? Find nearest snapshot to each 6 month/1 year increment?
-    - How often do UA codes change?
-- Result format may need to update to something w/ more details about each UA code provided there's more.
-
-```
-{
-    result:
-        {
-            url1: {
-                UA-XXXXXX: {
-                    last_used: date,
-                    first_used: date
-                }
-                UA-YYYYYY: 1
-            }
-        }
-}
-```
+For more info about UA-codes and what the GA-4 rollout means for OSINT: [https://digitalinvestigations.substack.com/p/what-the-rollout-of-google-analytics]

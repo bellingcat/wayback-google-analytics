@@ -115,7 +115,7 @@ async def get_snapshot_timestamps(
     """
 
     # Default params get snapshots from url domain w/ 200 status codes only.
-    cdx_url = f"http://web.archive.org/cdx/search/cdx?url={url}&matchType=domain&filter=statuscode:200&output=JSON"
+    cdx_url = f"http://web.archive.org/cdx/search/cdx?url={url}&matchType=domain&filter=statuscode:200&fl=timestamp&output=JSON"
 
     # Add correct params to cdx_url
     if frequency:

@@ -4,7 +4,7 @@ import asyncio
 from utils import (
     get_UA_code,
     get_GA_code,
-    get_page_title,
+    get_GTM_code,
     get_snapshot_timestamps,
     get_codes_from_snapshots,
     DEFAULT_HEADERS,
@@ -51,13 +51,23 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
             "current_GA_code": "G-1234567890",
             "current_GTM_code": "GTM-12345678",
             "archived_UA_codes": {
-                "UA-12345678-1": ["20190101000000", "20190102000000", ...],
-                "UA-12345678-2": ["20190101000000", "20190102000000", ...],
+                "UA-12345678-1": {
+                    "first_seen": "20190101000000",
+                    "last_seen": "20190101000000",
+                },
             },
             "archived_GA_codes": {
-                "G-1234567890": ["20190101000000", "20190102000000", ...],
+                "G-1234567890": {
+                    "first_seen": "20190101000000",
+                    "last_seen": "20190101000000",
+                }
             },
-        }
+            "archived_GTM_codes": {
+                "GTM-12345678": {
+                    "first_seen": "20190101000000",
+                    "last_seen": "20190101000000",
+                },
+        },
 
     """
 
@@ -70,7 +80,7 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
     if html:
         curr_entry["current_UA_code"] = get_UA_code(html)
         curr_entry["current_GA_code"] = get_GA_code(html)
-        curr_entry["title"] = url
+        curr_entry["current_GTM_code"] = get_GTM_code(html)
         print("FINISH CURRENT CODES", url)
 
     # Get snapshots for Wayback Machine
@@ -90,6 +100,7 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
     )
     curr_entry["archived_UA_codes"] = archived_codes["UA_codes"]
     curr_entry["archived_GA_codes"] = archived_codes["GA_codes"]
+    curr_entry["archived_GTM_codes"] = archived_codes["GTM_codes"]
 
     print("FINISH ARCHIVED CODES", url)
 
@@ -119,13 +130,28 @@ async def get_analytics_codes(
             "someurl.com": {
                 "current_UA_code": "UA-12345678-1",
                 "current_GA_code": "G-1234567890",
+                "current_GTM_code": "GTM-12345678",
                 "archived_UA_codes": {
-                    "UA-12345678-1": ["20190101000000", "20190102000000", ...],
-                    "UA-12345678-2": ["20190101000000", "20190102000000", ...],
+                    "UA-12345678-1": {
+                        "first_seen": "20190101000000",
+                        "last_seen": "20200101000000",
+                    }
+                    "UA-12345678-2": {
+                        "first_seen": "20190101000000",
+                        "last_seen": "20200101000000",
+                    }
                 },
                 "archived_GA_codes": {
-                    "G-1234567890": ["20190101000000", "20190102000000", ...],
+                    "G-1234567890": {
+                        "first_seen": "20190101000000",
+                        "last_seen": "20200101000000",
+                    }
                 },
+                "archived_GTM_codes": {
+                    "GTM-12345678": {
+                        "first_seen": "20190101000000",
+                        "last_seen": "20200101000000",
+                    }
             },
             "someotherurl.com": {...},
         }

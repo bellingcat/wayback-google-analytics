@@ -25,10 +25,12 @@ async def get_html(session, url):
     try:
         async with session.get(url, headers=DEFAULT_HEADERS) as response:
             return await response.text()
+    except aiohttp.ClientError as e:
+        print(f"Failed to reach {url}", e)
+    except aiohttp.ServerTimeoutError as e:
+        print(f"Request to {url} timed out", e)
     except Exception as e:
-        print(
-            "GET HTML ERROR", e
-        )  # TODO: Improve error handling (look into aiohttp errors)
+        print(f"Error getting data from {url}", e)
         return None
 
 

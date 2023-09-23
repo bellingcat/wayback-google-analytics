@@ -184,7 +184,6 @@ def setup_args():
         Command line arguments (argparse)
 
     TODO: Figure out how to manage limit and frequency args to prevent conflicts.
-    TODO: Implement "direction"
     """
 
     parser = argparse.ArgumentParser()
@@ -192,7 +191,7 @@ def setup_args():
         "--urls",
         nargs="+",
         required=True,
-        help="List of urls to scrape",
+        help="Enter a list of urls separated by spaces to get their UA/GA codes (e.g. --urls https://www.google.com https://www.facebook.com)",
     )
     parser.add_argument(
         "--start_date",
@@ -212,7 +211,7 @@ def setup_args():
     parser.add_argument(
         "--limit",
         default=-100,
-        help="Limit number of snapshots returned. Defaults to -100.",
+        help="Limits number of snapshots returned. Defaults to -100.",
     )
 
     return parser.parse_args()

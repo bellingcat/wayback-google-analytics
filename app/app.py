@@ -4,7 +4,7 @@ import asyncio
 from utils import (
     get_UA_code,
     get_GA_code,
-    get_page_title,
+    get_GTM_code,
     get_snapshot_timestamps,
     get_codes_from_snapshots,
     DEFAULT_HEADERS,
@@ -49,6 +49,7 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
         "someurl.com": {
             "current_UA_code": "UA-12345678-1",
             "current_GA_code": "G-1234567890",
+            "current_GTM_code": "GTM-12345678",
             "archived_UA_codes": {
                 "UA-12345678-1": ["20190101000000", "20190102000000", ...],
                 "UA-12345678-2": ["20190101000000", "20190102000000", ...],
@@ -69,6 +70,7 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
     if html:
         curr_entry["current_UA_code"] = get_UA_code(html)
         curr_entry["current_GA_code"] = get_GA_code(html)
+        curr_entry["current_GTM_code"] = get_GTM_code(html)
         curr_entry["title"] = url
         print("FINISH CURRENT CODES", url)
 

@@ -3,6 +3,9 @@ import asyncio
 from bs4 import BeautifulSoup
 import re
 
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 # Semaphore to limit number of concurrent requests (10-15 appears to work fine. 20+ causes 443 error from web.archive.org)
 sem = asyncio.Semaphore(15)
 
@@ -13,11 +16,52 @@ DEFAULT_HEADERS = {
 
 # Collapse options for CDX api
 COLLAPSE_OPTIONS = {
-    "hour": "10",
-    "day": "8",
-    "month": "6",
-    "year": "4",
+    "hourly": "10",
+    "daily": "8",
+    "monthly": "6",
+    "yearly": "4",
 }
+
+def get_limit_from_frequency(frequency, start_date, end_date):
+    """Returns an appropriate limit for a given frequency.
+
+    Args:
+        frequency (str): Frequency (hourly, daily, monthly, yearly)
+
+    Returns:
+        int: Limit
+    """
+
+    # Get start date as datetime object or raise error if not provided
+    if not start_date:
+        raise ValueError("To set a frequency you must provide a start date.")
+
+    # Get end date as current date if not present
+    if not end_date:
+        end_date = datetime.now()
+    else:
+        end_date = datetime.strptime(end_date, "%Y%m%d%H%M%S")
+
+    # Get start and end dates as datetime objects
+    start_date = datetime.strptime(start_date, "%Y%m%d%H%M%S")
+
+    delta = relativedelta(end_date, start_date)
+
+    if frequency == "yearly":
+        return delta.years + 1
+
+    if frequency == "monthly":
+        return delta.years * 12 + delta.months + 1
+
+    if frequency == "daily":
+        return delta.years * 365 + delta.months * 30 + delta.days + 1
+
+    if frequency == "hourly":
+        return delta.years * 365 * 24 + delta.months * 30 * 24 + delta.days * 24 + delta.hours + 1
+
+    return None
+
+
 
 
 def get_UA_code(html):
@@ -150,7 +194,7 @@ async def get_snapshot_timestamps(
     if start_date:
         cdx_url += f"&from={start_date}"
 
-    if start_date and end_date:
+    if end_date:
         cdx_url += f"&to={end_date}"
 
     print("CDX url= ", cdx_url)

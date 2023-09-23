@@ -67,6 +67,29 @@ def get_GA_code(html):
     # Remove duplicates and return
     return list(set(GA_codes))
 
+def get_GTM_code(html):
+    """Returns GTM codes (w/o duplicates) from given html, or None if not found.
+
+    Args:
+        html (str): Raw html.
+
+    Returns:
+        ["GTM-1234567890", "GTM-1234567891", ...]
+    """
+
+    # This pattern
+    pattern = re.compile(r'GTM-[A-Za-z0-9]{1,}')
+
+    # Find all GTM codes in html or return None
+    try:
+        GTM_codes = pattern.findall(html)
+    except Exception as e:
+        print(e)
+        return None
+
+    # Remove duplicates and return
+    return list(set(GTM_codes))
+
 
 def get_page_title(html):
     """Returns page title from given html, or None if not found."""

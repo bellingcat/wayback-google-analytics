@@ -189,6 +189,12 @@ async def get_codes_from_snapshots(session, url, timestamps):
                     "last_seen": "20190101000000"
                     },
                 },
+            "GTM_codes": {
+                "GTM-1234567890": {
+                    "first_seen": "20190101000000",
+                    "last_seen": "20190101000000"
+                    },
+                },
         }
     """
 
@@ -199,6 +205,7 @@ async def get_codes_from_snapshots(session, url, timestamps):
     results = {
         "UA_codes": {},
         "GA_codes": {},
+        "GTM_codes": {},
     }
 
     # Get codes from each timestamp with asyncio.gather().
@@ -234,6 +241,7 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
                     # Get UA/GA codes from html
                     UA_codes = get_UA_code(html)
                     GA_codes = get_GA_code(html)
+                    GTM_codes = get_GTM_code(html)
 
                     # above functions return lists, so iterate thru codes and update
                     # results dict
@@ -255,6 +263,16 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
                         if code in results["GA_codes"]:
                             results["GA_codes"][code]["last_seen"] = timestamp
 
+                    for code in GTM_codes:
+                        if code not in results["GTM_codes"]:
+                            results["GTM_codes"][code] = {}
+                            results["GTM_codes"][code]["first_seen"] = timestamp
+                            results["GTM_codes"][code]["last_seen"] = timestamp
+
+                        if code in results["GTM_codes"]:
+                            results["GTM_codes"][code]["last_seen"] = timestamp
+
+            # TODO: Add better/clearer error handling here
             except Exception as e:
                 print("ERROR in ASYNC ARCHIVE CODES", e)
                 return None

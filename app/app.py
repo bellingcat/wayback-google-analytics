@@ -5,6 +5,7 @@ from utils import (
     get_UA_code,
     get_GA_code,
     get_GTM_code,
+    get_GTM_code,
     get_snapshot_timestamps,
     get_codes_from_snapshots,
     DEFAULT_HEADERS,
@@ -29,7 +30,12 @@ async def get_html(session, url):
         print(f"Request to {url} timed out", e)
     except aiohttp.ClientError as e:
         print(f"Failed to reach {url}", e)
+    except aiohttp.ServerTimeoutError as e:
+        print(f"Request to {url} timed out", e)
+    except aiohttp.ClientError as e:
+        print(f"Failed to reach {url}", e)
     except Exception as e:
+        print(f"Error getting data from {url}", e)
         print(f"Error getting data from {url}", e)
         return None
 
@@ -80,6 +86,7 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
     if html:
         curr_entry[url]["current_UA_code"] = get_UA_code(html)
         curr_entry[url]["current_GA_code"] = get_GA_code(html)
+        curr_entry["current_GTM_code"] = get_GTM_code(html)
         curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
         print("FINISH CURRENT CODES", url)
 
@@ -216,7 +223,6 @@ def setup_args():
         Command line arguments (argparse)
 
     TODO: Figure out how to manage limit and frequency args to prevent conflicts.
-    TODO: Implement "direction"
     """
 
     parser = argparse.ArgumentParser()
@@ -224,7 +230,7 @@ def setup_args():
         "--urls",
         nargs="+",
         required=True,
-        help="List of urls to scrape",
+        help="Enter a list of urls separated by spaces to get their UA/GA codes (e.g. --urls https://www.google.com https://www.facebook.com)",
     )
     parser.add_argument(
         "--start_date",
@@ -244,7 +250,7 @@ def setup_args():
     parser.add_argument(
         "--limit",
         default=-100,
-        help="Limit number of snapshots returned. Defaults to -100.",
+        help="Limits number of snapshots returned. Defaults to -100.",
     )
 
     return parser.parse_args()

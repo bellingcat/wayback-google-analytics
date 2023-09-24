@@ -7,7 +7,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 # Semaphore to limit number of concurrent requests (10-15 appears to work fine. 20+ causes 443 error from web.archive.org)
-sem = asyncio.Semaphore(15)
+sem = asyncio.Semaphore(10)
 
 # Default headers for requests
 DEFAULT_HEADERS = {

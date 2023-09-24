@@ -78,9 +78,9 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
     html = await get_html(session, url)
     print("GETTING CURRENT CODES", url)
     if html:
-        curr_entry["current_UA_code"] = get_UA_code(html)
-        curr_entry["current_GA_code"] = get_GA_code(html)
-        curr_entry["current_GTM_code"] = get_GTM_code(html)
+        curr_entry[url]["current_UA_code"] = get_UA_code(html)
+        curr_entry[url]["current_GA_code"] = get_GA_code(html)
+        curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
         print("FINISH CURRENT CODES", url)
 
     # Get snapshots for Wayback Machine
@@ -98,9 +98,9 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
     archived_codes = await get_codes_from_snapshots(
         session=session, url=url, timestamps=archived_snapshots
     )
-    curr_entry["archived_UA_codes"] = archived_codes["UA_codes"]
-    curr_entry["archived_GA_codes"] = archived_codes["GA_codes"]
-    curr_entry["archived_GTM_codes"] = archived_codes["GTM_codes"]
+    curr_entry[url]["archived_UA_codes"] = archived_codes["UA_codes"]
+    curr_entry[url]["archived_GA_codes"] = archived_codes["GA_codes"]
+    curr_entry[url]["archived_GTM_codes"] = archived_codes["GTM_codes"]
 
     print("FINISH ARCHIVED CODES", url)
 
@@ -186,6 +186,9 @@ async def main(args):
     Returns:
         None
     """
+
+    if args.frequency:
+        print("FREQUENCY", args.frequency)
 
     async with aiohttp.ClientSession() as session:
         results = await get_analytics_codes(

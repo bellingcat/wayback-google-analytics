@@ -50,7 +50,12 @@ def get_limit_from_frequency(frequency, start_date, end_date):
     # Get start and end dates as datetime objects
     start_date = datetime.strptime(start_date, "%Y%m%d%H%M%S")
 
+    # Get delta between start and end dates
     delta = relativedelta(end_date, start_date)
+
+    # Remove whitespace and convert frequency to lower case
+    if frequency:
+        frequency.strip().lower()
 
     if frequency == "yearly":
         return delta.years + 1
@@ -66,7 +71,8 @@ def get_limit_from_frequency(frequency, start_date, end_date):
         total_hours = (end_date - start_date).total_seconds() / 3600
         return int(total_hours + 1)
 
-    return None
+    # Raise error if frequency none of the above options
+    raise ValueError(f"Invalid frequency: {frequency}. Please use hourly, daily, monthly, or yearly.")
 
 def get_page_title(html):
     """Returns page title from given html, or None if not found."""

@@ -30,6 +30,8 @@ def get_limit_from_frequency(frequency, start_date, end_date):
 
     Args:
         frequency (str): Frequency (hourly, daily, monthly, yearly)
+        start_date (str): 14-digit timestamp for starting point
+        end_date (str): 14-digit timestamp for end of range
 
     Returns:
         int: Limit
@@ -57,16 +59,12 @@ def get_limit_from_frequency(frequency, start_date, end_date):
         return delta.years * 12 + delta.months + 1
 
     if frequency == "daily":
-        return delta.years * 365 + delta.months * 30 + delta.days + 1
+        total_days = (end_date - start_date).days
+        return total_days + 1
 
     if frequency == "hourly":
-        return (
-            delta.years * 365 * 24
-            + delta.months * 30 * 24
-            + delta.days * 24
-            + delta.hours
-            + 1
-        )
+        total_hours = (end_date - start_date).total_seconds() / 3600
+        return int(total_hours + 1)
 
     return None
 

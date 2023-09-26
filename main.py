@@ -2,12 +2,12 @@ import aiohttp
 import asyncio
 import argparse
 from osint_ga.utils import (
-    get_limit_from_frequency
+    get_limit_from_frequency,
+    COLLAPSE_OPTIONS,
 )
 
 from osint_ga.scraper import (
     get_analytics_codes,
-    COLLAPSE_OPTIONS,
 )
 
 async def main(args):

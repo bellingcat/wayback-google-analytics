@@ -1,4 +1,5 @@
 import re
+from bs4 import BeautifulSoup
 
 def get_UA_code(html):
     """Returns UA codes (w/o duplicates) from given html, or None if not found.
@@ -10,12 +11,17 @@ def get_UA_code(html):
         ["UA-12345678-1", "UA-12345678-2", ...]
     """
 
+    script_tags = BeautifulSoup(html, "html.parser").find_all("script")
+
     # Regex pattern to find UA codes
-    pattern = re.compile(r"UA-[a-zA-Z0-9-]{5,15}")
+    pattern = re.compile(r"UA-[\d-]{5,15}")
 
     # Find all UA codes in html
     try:
-        UA_codes = pattern.findall(html)
+        UA_codes = []
+        for script in script_tags:
+            curr_codes = pattern.findall(script.text)
+            UA_codes += curr_codes
     except Exception as e:
         print(e)
         return None
@@ -34,12 +40,17 @@ def get_GA_code(html):
         ["G-1234567890", "G-1234567891", ...]
     """
 
+    script_tags = BeautifulSoup(html, "html.parser").find_all("script")
+
     # Regex pattern to find GA codes
-    pattern = re.compile(r"G-[a-zA-Z0-9-]{5,15}")
+    pattern = re.compile(r"G-[\d-]{5,15}")
 
     # Find all GA codes in html or return None
     try:
-        GA_codes = pattern.findall(html)
+        GA_codes = []
+        for script in script_tags:
+            curr_codes = pattern.findall(script.text)
+            GA_codes += curr_codes
     except Exception as e:
         print(e)
         return None
@@ -56,12 +67,17 @@ def get_GTM_code(html):
         ["GTM-1234567890", "GTM-1234567891", ...]
     """
 
+    script_tags = BeautifulSoup(html, "html.parser").find_all("script")
+
     # This pattern
-    pattern = re.compile(r"GTM-[A-Za-z0-9]{1,}")
+    pattern = re.compile(r"GTM-[\w-]{1,15}")
 
     # Find all GTM codes in html or return None
     try:
-        GTM_codes = pattern.findall(html)
+        GTM_codes = []
+        for script in script_tags:
+            curr_codes = pattern.findall(script.text)
+            GTM_codes += curr_codes
     except Exception as e:
         print(e)
         return None

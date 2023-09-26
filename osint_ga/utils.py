@@ -1,10 +1,13 @@
-import aiohttp
 import asyncio
-from bs4 import BeautifulSoup
 import re
 
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
+from osint_ga.codes import get_UA_code, get_GA_code, get_GTM_code
+
 # Semaphore to limit number of concurrent requests (10-15 appears to work fine. 20+ causes 443 error from web.archive.org)
-sem = asyncio.Semaphore(15)
+sem = asyncio.Semaphore(10)
 
 # Default headers for requests
 DEFAULT_HEADERS = {
@@ -13,76 +16,61 @@ DEFAULT_HEADERS = {
 
 # Collapse options for CDX api
 COLLAPSE_OPTIONS = {
-    "hour": "10",
-    "day": "8",
-    "month": "6",
-    "year": "4",
+    "hourly": "10",
+    "daily": "8",
+    "monthly": "6",
+    "yearly": "4",
 }
 
 
-def get_UA_code(html):
-    """Returns UA codes (w/o duplicates) from given html, or None if not found.
+def get_limit_from_frequency(frequency, start_date, end_date):
+    """Returns an appropriate limit for a given frequency.
 
     Args:
-        html (str): Raw html.
+        frequency (str): Frequency (hourly, daily, monthly, yearly)
+        start_date (str): 14-digit timestamp for starting point
+        end_date (str): 14-digit timestamp for end of range
 
     Returns:
-        ["UA-12345678-1", "UA-12345678-2", ...]
+        int: Limit
     """
 
-    # Regex pattern to find UA codes
-    pattern = re.compile("UA-\d[^\"|']*")
+    # Get start date as datetime object or raise error if not provided
+    if not start_date:
+        raise ValueError("To set a frequency you must provide a start date.")
 
-    # Find all UA codes in html or return None
-    try:
-        UA_codes = pattern.findall(html)
-    except Exception as e:
-        print(e)
-        return None
+    # Get end date as current date if not present
+    if not end_date:
+        end_date = datetime.now()
+    else:
+        end_date = datetime.strptime(end_date, "%Y%m%d%H%M%S")
 
-    # Remove duplicates and return
-    return list(set(UA_codes))
+    # Get start and end dates as datetime objects
+    start_date = datetime.strptime(start_date, "%Y%m%d%H%M%S")
 
+    # Get delta between start and end dates
+    delta = relativedelta(end_date, start_date)
 
-def get_GA_code(html):
-    """Returns GA codes (w/o duplicates) from given html, or None if not found.
+    # Remove whitespace and convert frequency to lower case
+    if frequency:
+        frequency.strip().lower()
 
-    Args:
-        html (str): Raw html.
+    if frequency == "yearly":
+        return delta.years + 1
 
-    Returns:
-        ["G-1234567890", "G-1234567891", ...]
-    """
+    if frequency == "monthly":
+        return delta.years * 12 + delta.months + 1
 
-    # Regex pattern to find GA codes
-    pattern = re.compile(r"G-[A-Za-z0-9]{10}")
+    if frequency == "daily":
+        total_days = (end_date - start_date).days
+        return total_days + 1
 
-    # Find all GA codes in html or return None
-    try:
-        GA_codes = pattern.findall(html)
-    except Exception as e:
-        print(e)
-        return None
+    if frequency == "hourly":
+        total_hours = (end_date - start_date).total_seconds() / 3600
+        return int(total_hours + 1)
 
-    # Remove duplicates and return
-    return list(set(GA_codes))
-
-
-def get_page_title(html):
-    """Returns page title from given html, or None if not found."""
-
-    # Get soup object from html
-    soup = BeautifulSoup(html, "html.parser")
-
-    # Find title or return None
-    try:
-        title = soup.title.string
-    except Exception as e:
-        print(e)
-        return None
-
-    return title
-
+    # Raise error if frequency none of the above options
+    raise ValueError(f"Invalid frequency: {frequency}. Please use hourly, daily, monthly, or yearly.")
 
 async def get_snapshot_timestamps(
     session,
@@ -115,7 +103,7 @@ async def get_snapshot_timestamps(
     """
 
     # Default params get snapshots from url domain w/ 200 status codes only.
-    cdx_url = f"http://web.archive.org/cdx/search/cdx?url={url}&matchType=domain&filter=statuscode:200&output=JSON"
+    cdx_url = f"http://web.archive.org/cdx/search/cdx?url={url}&matchType=domain&filter=statuscode:200&fl=timestamp&output=JSON"
 
     # Add correct params to cdx_url
     if frequency:
@@ -127,7 +115,7 @@ async def get_snapshot_timestamps(
     if start_date:
         cdx_url += f"&from={start_date}"
 
-    if start_date and end_date:
+    if end_date:
         cdx_url += f"&to={end_date}"
 
     print("CDX url= ", cdx_url)
@@ -166,6 +154,12 @@ async def get_codes_from_snapshots(session, url, timestamps):
                     "last_seen": "20190101000000"
                     },
                 },
+            "GTM_codes": {
+                "GTM-1234567890": {
+                    "first_seen": "20190101000000",
+                    "last_seen": "20190101000000"
+                    },
+                },
         }
     """
 
@@ -176,6 +170,7 @@ async def get_codes_from_snapshots(session, url, timestamps):
     results = {
         "UA_codes": {},
         "GA_codes": {},
+        "GTM_codes": {},
     }
 
     # Get codes from each timestamp with asyncio.gather().
@@ -211,6 +206,7 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
                     # Get UA/GA codes from html
                     UA_codes = get_UA_code(html)
                     GA_codes = get_GA_code(html)
+                    GTM_codes = get_GTM_code(html)
 
                     # above functions return lists, so iterate thru codes and update
                     # results dict
@@ -232,6 +228,16 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
                         if code in results["GA_codes"]:
                             results["GA_codes"][code]["last_seen"] = timestamp
 
+                    for code in GTM_codes:
+                        if code not in results["GTM_codes"]:
+                            results["GTM_codes"][code] = {}
+                            results["GTM_codes"][code]["first_seen"] = timestamp
+                            results["GTM_codes"][code]["last_seen"] = timestamp
+
+                        if code in results["GTM_codes"]:
+                            results["GTM_codes"][code]["last_seen"] = timestamp
+
+            # TODO: Add better/clearer error handling here
             except Exception as e:
                 print("ERROR in ASYNC ARCHIVE CODES", e)
                 return None

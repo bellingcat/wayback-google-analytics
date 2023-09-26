@@ -1,10 +1,11 @@
 import aiohttp
-import argparse
 import asyncio
-from utils import (
+from osint_ga.codes import (
     get_UA_code,
     get_GA_code,
-    get_page_title,
+    get_GTM_code,
+)
+from osint_ga.utils import (
     get_snapshot_timestamps,
     get_codes_from_snapshots,
     DEFAULT_HEADERS,
@@ -25,10 +26,12 @@ async def get_html(session, url):
     try:
         async with session.get(url, headers=DEFAULT_HEADERS) as response:
             return await response.text()
+    except aiohttp.ServerTimeoutError as e:
+        print(f"Request to {url} timed out", e)
+    except aiohttp.ClientError as e:
+        print(f"Failed to reach {url}", e)
     except Exception as e:
-        print(
-            "GET HTML ERROR", e
-        )  # TODO: Improve error handling (look into aiohttp errors)
+        print(f"Error getting data from {url}", e)
         return None
 
 
@@ -47,14 +50,25 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
         "someurl.com": {
             "current_UA_code": "UA-12345678-1",
             "current_GA_code": "G-1234567890",
+            "current_GTM_code": "GTM-12345678",
             "archived_UA_codes": {
-                "UA-12345678-1": ["20190101000000", "20190102000000", ...],
-                "UA-12345678-2": ["20190101000000", "20190102000000", ...],
+                "UA-12345678-1": {
+                    "first_seen": "20190101000000",
+                    "last_seen": "20190101000000",
+                },
             },
             "archived_GA_codes": {
-                "G-1234567890": ["20190101000000", "20190102000000", ...],
+                "G-1234567890": {
+                    "first_seen": "20190101000000",
+                    "last_seen": "20190101000000",
+                }
             },
-        }
+            "archived_GTM_codes": {
+                "GTM-12345678": {
+                    "first_seen": "20190101000000",
+                    "last_seen": "20190101000000",
+                },
+        },
 
     """
 
@@ -65,9 +79,10 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
     html = await get_html(session, url)
     print("GETTING CURRENT CODES", url)
     if html:
-        curr_entry["current_UA_code"] = get_UA_code(html)
-        curr_entry["current_GA_code"] = get_GA_code(html)
-        curr_entry["title"] = url
+        curr_entry[url]["current_UA_code"] = get_UA_code(html)
+        curr_entry[url]["current_GA_code"] = get_GA_code(html)
+        curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
+        curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
         print("FINISH CURRENT CODES", url)
 
     # Get snapshots for Wayback Machine
@@ -85,8 +100,9 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
     archived_codes = await get_codes_from_snapshots(
         session=session, url=url, timestamps=archived_snapshots
     )
-    curr_entry["archived_UA_codes"] = archived_codes["UA_codes"]
-    curr_entry["archived_GA_codes"] = archived_codes["GA_codes"]
+    curr_entry[url]["archived_UA_codes"] = archived_codes["UA_codes"]
+    curr_entry[url]["archived_GA_codes"] = archived_codes["GA_codes"]
+    curr_entry[url]["archived_GTM_codes"] = archived_codes["GTM_codes"]
 
     print("FINISH ARCHIVED CODES", url)
 
@@ -116,18 +132,31 @@ async def get_analytics_codes(
             "someurl.com": {
                 "current_UA_code": "UA-12345678-1",
                 "current_GA_code": "G-1234567890",
+                "current_GTM_code": "GTM-12345678",
                 "archived_UA_codes": {
-                    "UA-12345678-1": ["20190101000000", "20190102000000", ...],
-                    "UA-12345678-2": ["20190101000000", "20190102000000", ...],
+                    "UA-12345678-1": {
+                        "first_seen": "20190101000000",
+                        "last_seen": "20200101000000",
+                    }
+                    "UA-12345678-2": {
+                        "first_seen": "20190101000000",
+                        "last_seen": "20200101000000",
+                    }
                 },
                 "archived_GA_codes": {
-                    "G-1234567890": ["20190101000000", "20190102000000", ...],
+                    "G-1234567890": {
+                        "first_seen": "20190101000000",
+                        "last_seen": "20200101000000",
+                    }
                 },
+                "archived_GTM_codes": {
+                    "GTM-12345678": {
+                        "first_seen": "20190101000000",
+                        "last_seen": "20200101000000",
+                    }
             },
             "someotherurl.com": {...},
         }
-
-    TODO: Currently doesn't include GTM-ids.
     """
 
     # Comprehension to create list of tasks for asyncio.gather()
@@ -146,78 +175,3 @@ async def get_analytics_codes(
     # Process urls concurrently and return results
     results = await asyncio.gather(*tasks)
     return results
-
-
-async def main(args):
-    """Main function. Runs get_analytics_codes() and prints results.
-
-    Args:
-        args: Command line arguments (argparse)
-
-    Returns:
-        None
-    """
-
-    async with aiohttp.ClientSession() as session:
-        results = await get_analytics_codes(
-            session=session,
-            urls=args.urls,
-            start_date=args.start_date,
-            end_date=args.end_date,
-            frequency=args.frequency,
-            limit=args.limit,
-        )
-        print(results)
-
-
-def setup_args():
-    """Setup command line arguments. Returns args for use in main().
-
-    CLI Args:
-        --urls: List of urls to scrape
-        --start_date: Start date for time range. Defaults to Oct 1, 2012, when UA codes were adopted.
-        --end_date: End date for time range. Defaults to None.
-        --frequency: Can limit snapshots to remove duplicates (1 per hr, day, month, etc). Defaults to None.
-        --limit: Limit number of snapshots returned. Defaults to None.
-
-    Returns:
-        Command line arguments (argparse)
-
-    TODO: Figure out how to manage limit and frequency args to prevent conflicts.
-    TODO: Implement "direction"
-    """
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--urls",
-        nargs="+",
-        required=True,
-        help="List of urls to scrape",
-    )
-    parser.add_argument(
-        "--start_date",
-        default="20121001000000",
-        help="Start date for time range. Defaults to Oct 1, 2012, when UA codes were adopted.",
-    )
-    parser.add_argument(
-        "--end_date",
-        default=None,
-        help="End date for time range. Defaults to None.",
-    )
-    parser.add_argument(
-        "--frequency",
-        default=None,
-        help="Can limit snapshots to remove duplicates (1 per hr, day, month, etc). Defaults to None.",
-    )
-    parser.add_argument(
-        "--limit",
-        default=-100,
-        help="Limit number of snapshots returned. Defaults to -100.",
-    )
-
-    return parser.parse_args()
-
-
-if __name__ == "__main__":
-    args = setup_args()
-    asyncio.run(main(args))

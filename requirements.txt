@@ -9,8 +9,10 @@ charset-normalizer==3.2.0
 frozenlist==1.4.0
 idna==3.4
 multidict==6.0.4
+python-dateutil==2.8.2
 python-dotenv==1.0.0
 requests==2.31.0
+six==1.16.0
 soupsieve==2.5
 urllib3==2.0.4
 yarl==1.9.2

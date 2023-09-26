@@ -72,6 +72,27 @@ def get_limit_from_frequency(frequency, start_date, end_date):
     # Raise error if frequency none of the above options
     raise ValueError(f"Invalid frequency: {frequency}. Please use hourly, daily, monthly, or yearly.")
 
+def get_14_digit_timestamp(date):
+    """Takes a date (dd/mm/YYYY:HH:MM) and converts it to a 14-digit timestamp (YYYYmmddHHMMSS).
+
+    Args:
+        date (str): Date in format dd/mm/YYYY:HH:MM
+
+    Returns:
+        str: 14-digit timestamp (YYYYmmddHHMMSS)
+
+    Example: 01/10/2012:00:00 -> 20121001000000
+    """
+
+    # Convert date to datetime object
+    try:
+        date = datetime.strptime(date, "%d/%m/%Y:%H:%M")
+    except ValueError:
+        date = datetime.strptime(date, "%d/%m/%Y")
+
+    # Convert datetime object to 14-digit timestamp
+    return date.strftime("%Y%m%d%H%M%S")
+
 async def get_snapshot_timestamps(
     session,
     url,
@@ -93,13 +114,6 @@ async def get_snapshot_timestamps(
     Returns:
         Array of timestamps:
             ["20190101000000", "20190102000000", ...]
-
-    NOTE: The CDX params are a bit finnicky. It may be best to return a larger number of timestamps and then filter out the
-    ones we don't need. That would lead to longer load times, however. Main issues include:
-
-    - 'frequency' often breaks with other params. It is most reliable when paired with an exact limit (if getting years
-    since 2012, add a limit of 11 results)
-    - 'limit' breaks with frequency and start date if inverted to get most recent snapshots first.
     """
 
     # Default params get snapshots from url domain w/ 200 status codes only.

@@ -20,6 +20,14 @@ async def main(args):
         None
     """
 
+    # Update dates to 14-digit format
+    if args.start_date:
+        print(args.start_date)
+
+    if args.end_date:
+        print(args.end_date)
+
+    # Gets appropriate limit for given frequency & converts frequency to collapse option
     if args.frequency:
         args.limit = get_limit_from_frequency(
             frequency=args.frequency,
@@ -27,6 +35,7 @@ async def main(args):
             end_date=args.end_date,
         ) + 1
         args.frequency = COLLAPSE_OPTIONS[args.frequency]
+
 
     async with aiohttp.ClientSession() as session:
         results = await get_analytics_codes(
@@ -64,12 +73,12 @@ def setup_args():
     parser.add_argument(
         "--start_date",
         default="20121001000000",
-        help="Start date for time range. Defaults to Oct 1, 2012, when UA codes were adopted.",
+        help="Start date for time range (dd/mm/YYYY:HH:MM) Defaults to 01/10/2012:00:00, when UA codes were adopted.",
     )
     parser.add_argument(
         "--end_date",
         default=None,
-        help="End date for time range. Defaults to None.",
+        help="End date for time range (dd/mm/YYYY:HH:MM). Defaults to None.",
     )
     parser.add_argument(
         "--frequency",

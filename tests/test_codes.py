@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from app.codes import get_UA_code, get_GA_code, get_GTM_code
+from osint_ga.codes import get_UA_code, get_GA_code, get_GTM_code
 
 
 class CodesTestCase(TestCase):
@@ -22,6 +22,11 @@ class CodesTestCase(TestCase):
                     gtag("config", "GTM-23451");
                 </script>
             </head>
+            <body>
+                <p>"UA-12345678-2"</p>
+                <p>"G-12345678-2"</p>
+                <p>"GTM-2333234"</p>
+            </body>
         </html>
         """
 
@@ -42,9 +47,13 @@ class CodesTestCase(TestCase):
                     gtag("config", "GTM-23451");
                     gtag("config", "GTM-2333234");
                     gtag("config", "GTM-2124");
-
                 </script>
             </head>
+            <body>
+                <p>"UA-12345678-2"</p>
+                <p>"G-12345678-2"</p>
+                <p>"GTM-2333234"</p>
+            </body>
         </html>
         """
 
@@ -59,6 +68,11 @@ class CodesTestCase(TestCase):
                     gtag("config", "NOCODEHERE");
                 </script>
             </head>
+            <body>
+                <p>"UA-12345678-2"</p>
+                <p>"G-12345678-2"</p>
+                <p>"GTM-2333234"</p>
+            </body>
         </html>
         """
 

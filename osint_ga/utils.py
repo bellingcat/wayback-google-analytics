@@ -1,6 +1,4 @@
-import aiohttp
 import asyncio
-from bs4 import BeautifulSoup
 import re
 
 from datetime import datetime
@@ -73,22 +71,6 @@ def get_limit_from_frequency(frequency, start_date, end_date):
 
     # Raise error if frequency none of the above options
     raise ValueError(f"Invalid frequency: {frequency}. Please use hourly, daily, monthly, or yearly.")
-
-def get_page_title(html):
-    """Returns page title from given html, or None if not found."""
-
-    # Get soup object from html
-    soup = BeautifulSoup(html, "html.parser")
-
-    # Find title or return None
-    try:
-        title = soup.title.string
-    except Exception as e:
-        print(e)
-        return None
-
-    return title
-
 
 async def get_snapshot_timestamps(
     session,

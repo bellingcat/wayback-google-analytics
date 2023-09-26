@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from app.utils import get_limit_from_frequency
+from osint_ga.utils import get_limit_from_frequency
 
 class UtilsTestCase(TestCase):
     """Tests for utils.py"""

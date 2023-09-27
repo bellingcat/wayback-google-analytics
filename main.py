@@ -3,6 +3,7 @@ import asyncio
 import argparse
 from osint_ga.utils import (
     get_limit_from_frequency,
+    get_14_digit_timestamp,
     COLLAPSE_OPTIONS,
 )
 
@@ -22,10 +23,10 @@ async def main(args):
 
     # Update dates to 14-digit format
     if args.start_date:
-        print(args.start_date)
+        args.start_date = get_14_digit_timestamp(args.start_date)
 
     if args.end_date:
-        print(args.end_date)
+        args.end_date = get_14_digit_timestamp(args.end_date)
 
     # Gets appropriate limit for given frequency & converts frequency to collapse option
     if args.frequency:
@@ -72,7 +73,7 @@ def setup_args():
     )
     parser.add_argument(
         "--start_date",
-        default="20121001000000",
+        default="01/10/2012:00:00",
         help="Start date for time range (dd/mm/YYYY:HH:MM) Defaults to 01/10/2012:00:00, when UA codes were adopted.",
     )
     parser.add_argument(

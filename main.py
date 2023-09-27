@@ -11,6 +11,11 @@ from osint_ga.scraper import (
     get_analytics_codes,
 )
 
+from osint_ga.output import (
+    init_output,
+    write_output,
+)
+
 async def main(args):
     """Main function. Runs get_analytics_codes() and prints results.
 
@@ -20,6 +25,18 @@ async def main(args):
     Returns:
         None
     """
+    # If input file is provided, read urls from file
+    if args.input:
+        try:
+            with open(args.input, "r") as f:
+                args.urls = f.read().splitlines()
+        except FileNotFoundError:
+            print("File not found. Please enter a valid file path.")
+            return
+
+    # Throws ValueError immediately if output type is incorrect or there is an issue writing to file
+    if args.output:
+        output_file = init_output(args.output)
 
     # Update dates to 14-digit format
     if args.start_date:
@@ -49,6 +66,10 @@ async def main(args):
         )
         print(results)
 
+    # handle printing the output
+    if args.output:
+        write_output(output_file, args.output, results)
+
 
 def setup_args():
     """Setup command line arguments. Returns args for use in main().
@@ -65,11 +86,22 @@ def setup_args():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument(
+
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "--input",
+        default=None,
+        help="Enter a file path to a list of urls in a text or .csv file."
+    )
+    group.add_argument(
         "--urls",
         nargs="+",
-        required=True,
         help="Enter a list of urls separated by spaces to get their UA/GA codes (e.g. --urls https://www.google.com https://www.facebook.com)",
+    )
+    parser.add_argument(
+        "--output",
+        default=None,
+        help="Enter a file path to save results to a .csv file."
     )
     parser.add_argument(
         "--start_date",
@@ -89,7 +121,7 @@ def setup_args():
     parser.add_argument(
         "--limit",
         default=-100,
-        help="Limits number of snapshots returned. Defaults to -100.",
+        help="Limits number of snapshots returned. Defaults to -100 (most recent 100 snapshots).",
     )
 
     return parser.parse_args()

@@ -70,7 +70,29 @@ def get_limit_from_frequency(frequency, start_date, end_date):
         return int(total_hours + 1)
 
     # Raise error if frequency none of the above options
-    raise ValueError(f"Invalid frequency: {frequency}. Please use hourly, daily, monthly, or yearly.")
+    raise ValueError(
+        f"Invalid frequency: {frequency}. Please use hourly, daily, monthly, or yearly."
+    )
+
+
+def get_date_from_timestamp(timestamp):
+    """Takes a 14-digit timestamp (YYYYmmddHHMMSS) and returns a date (dd/mm/YYYY:HH:MM).
+
+    Args:
+        timestamp (str): 14-digit timestamp (YYYYmmddHHMMSS)
+
+    Returns:
+        str: Date in format dd/mm/YYYY:HH:MM
+
+    Example: 20121001000000 -> 01/10/2012:00:00
+    """
+
+    # convert timestamp to datetime object
+    date = datetime.strptime(timestamp, "%Y%m%d%H%M%S")
+
+    # convert datetime object to date
+    return date.strftime("%d/%m/%Y:%H:%M")
+
 
 def get_14_digit_timestamp(date):
     """Takes a date (dd/mm/YYYY:HH:MM) and converts it to a 14-digit timestamp (YYYYmmddHHMMSS).
@@ -92,6 +114,7 @@ def get_14_digit_timestamp(date):
 
     # Convert datetime object to 14-digit timestamp
     return date.strftime("%Y%m%d%H%M%S")
+
 
 async def get_snapshot_timestamps(
     session,
@@ -227,29 +250,29 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
                     for code in UA_codes:
                         if code not in results["UA_codes"]:
                             results["UA_codes"][code] = {}
-                            results["UA_codes"][code]["first_seen"] = timestamp
-                            results["UA_codes"][code]["last_seen"] = timestamp
+                            results["UA_codes"][code]["first_seen"] = get_date_from_timestamp(timestamp)
+                            results["UA_codes"][code]["last_seen"] = get_date_from_timestamp(timestamp)
 
                         if code in results["UA_codes"]:
-                            results["UA_codes"][code]["last_seen"] = timestamp
+                            results["UA_codes"][code]["last_seen"] = get_date_from_timestamp(timestamp)
 
                     for code in GA_codes:
                         if code not in results["GA_codes"]:
                             results["GA_codes"][code] = {}
-                            results["GA_codes"][code]["first_seen"] = timestamp
-                            results["GA_codes"][code]["last_seen"] = timestamp
+                            results["GA_codes"][code]["first_seen"] = get_date_from_timestamp(timestamp)
+                            results["GA_codes"][code]["last_seen"] = get_date_from_timestamp(timestamp)
 
                         if code in results["GA_codes"]:
-                            results["GA_codes"][code]["last_seen"] = timestamp
+                            results["GA_codes"][code]["last_seen"] = get_date_from_timestamp(timestamp)
 
                     for code in GTM_codes:
                         if code not in results["GTM_codes"]:
                             results["GTM_codes"][code] = {}
-                            results["GTM_codes"][code]["first_seen"] = timestamp
-                            results["GTM_codes"][code]["last_seen"] = timestamp
+                            results["GTM_codes"][code]["first_seen"] = get_date_from_timestamp(timestamp)
+                            results["GTM_codes"][code]["last_seen"] = get_date_from_timestamp(timestamp)
 
                         if code in results["GTM_codes"]:
-                            results["GTM_codes"][code]["last_seen"] = timestamp
+                            results["GTM_codes"][code]["last_seen"] = get_date_from_timestamp(timestamp)
 
             # TODO: Add better/clearer error handling here
             except Exception as e:

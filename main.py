@@ -101,7 +101,8 @@ def setup_args():
     parser.add_argument(
         "--output",
         default=None,
-        help="Enter a file path to save results to a .csv file."
+        help="Enter a file path to save results to a .csv file.",
+        choices=["csv", "txt", "json", "xlsx"],
     )
     parser.add_argument(
         "--start_date",
@@ -117,6 +118,7 @@ def setup_args():
         "--frequency",
         default=None,
         help="Can limit snapshots to remove duplicates (1 per hr, day, month, etc). Defaults to None.",
+        choices=["yearly", "monthly", "daily", "hourly"],
     )
     parser.add_argument(
         "--limit",

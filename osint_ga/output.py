@@ -14,9 +14,11 @@ def init_output(type):
         None
     """
 
-    valid_types = ["csv", "txt", "json"]
+    valid_types = ["csv", "txt", "json", "xlsx"]
     if type not in valid_types:
-        raise ValueError(f"Invalid output type: {type}. Please use csv, txt, or json.")
+        raise ValueError(
+            f"Invalid output type: {type}. Please use csv, txt, xlsx or json."
+        )
 
     # Create output directory if it doesn't exist
     if not os.path.exists("output"):
@@ -26,8 +28,16 @@ def init_output(type):
     file_name = datetime.now().strftime("%d-%m-%Y(%H:%M:%S)")
 
     # Create output file
+    if type not in ["csv"]:
+        with open(os.path.join("./output", f"{file_name}.{type}"), "w") as f:
+            pass
 
-    with open(os.path.join("./output", f"{file_name}.{type}"), "w") as f:
+        return "./output/" + f"{file_name}.{type}"
+
+    with open(os.path.join("./output", f"{file_name}_urls.{type}"), "w") as f:
+        pass
+
+    with open(os.path.join("./output", f"{file_name}_codes.{type}"), "w") as f:
         pass
 
     return "./output/" + f"{file_name}.{type}"
@@ -45,7 +55,7 @@ def write_output(output_file, output_type, results):
         None
     """
 
-    # Determine output type
+    # If json or txt, write contents directly to file.
     if output_type == "json":
         with open(output_file, "w") as f:
             json.dump(results, f, indent=4)
@@ -54,25 +64,40 @@ def write_output(output_file, output_type, results):
         with open(output_file, "w") as f:
             json.dump(results, f, indent=4)
 
+    # If csv or xlsx, convert results to pandas dataframes.
+    urls_df = get_urls_df(results)
+    codes_df = get_codes_df(results)
+
+    # If csv, write dataframes to separate csv files for urls, codes.
     if output_type == "csv":
-        # make dataframes in pandas
-        # url_df = pd.DataFrame(
-        #     columns=[
-        #         "url",
-        #         "UA_Code",
-        #         "GA_Code",
-        #         "GTM_Code",
-        #         "Archived_UA_Codes",
-        #         "Archived_GA_Codes",
-        #         "Archived_GTM_Codes",
-        #     ]
-        # )
+        urls_output_file = output_file.replace(".csv", "_urls.csv")
+        codes_output_file = output_file.replace(".csv", "_codes.csv")
+        urls_df.to_csv(urls_output_file, index=False)
+        codes_df.to_csv(codes_output_file, index=False)
 
-        url_list = []
+    # If xlsx, write dataframes to separate sheets for urls, codes.
+    if output_type == "xlsx":
+        writer = pd.ExcelWriter(output_file, engine="xlsxwriter")
+        urls_df.to_excel(writer, sheet_name="URLs", index=False)
+        codes_df.to_excel(writer, sheet_name="Codes", index=False)
+        writer.close()
 
-        for item in results:
-            for url, info in item.items():
-                url_list.append({
+
+def get_urls_df(results):
+    """Flattens the results json and converts it into simple Pandas dataframe and returns it.
+
+    Args:
+        dict: Results from scraper.
+
+    Returns:
+        urls_df (pd.DataFrame): Pandas dataframe of results.
+    """
+    url_list = []
+
+    for item in results:
+        for url, info in item.items():
+            url_list.append(
+                {
                     "url": url,
                     "UA_Code": info["current_UA_code"],
                     "GA_Code": info["current_GA_code"],
@@ -80,8 +105,80 @@ def write_output(output_file, output_type, results):
                     "Archived_UA_Codes": info["archived_UA_codes"],
                     "Archived_GA_Codes": info["archived_GA_codes"],
                     "Archived_GTM_Codes": info["archived_GTM_codes"],
-                })
+                }
+            )
 
-        url_df = pd.DataFrame(url_list)
+    return pd.DataFrame(url_list)
 
-        url_df.to_csv(output_file, index=False)
+
+def get_codes_df(results):
+    """Converts the result dictionary into a Pandas dataframe and returns it.
+
+    Args:
+        dict: Results from scraper.
+
+    Returns:
+        codes_df (pd.DataFrame): Pandas dataframe of results.
+
+    """
+
+    code_list = []
+
+    # Flattens results into list of dicts for each code, including duplicates
+    for item in results:
+        for url, info in item.items():
+            for key, code in info.items():
+                if type(code) is list:
+                    for c in code:
+                        code_list.append(
+                            {
+                                "code": c,
+                                "websites": url,
+                                "active": f"Current (at {url})",
+                            }
+                        )
+                if type(code) is dict:
+                    for c in code:
+                        print("dict code = ", c)
+                        print("code itself = ", code)
+                        code_list.append(
+                            {
+                                "code": c,
+                                "websites": url,
+                                "active": f"{code[c]['first_seen']} - {code[c]['last_seen']}(at {url})",
+                            }
+                        )
+
+    # Convert list of dicts to pandas dataframe
+    codes_df = pd.DataFrame(code_list)
+
+    # Combine all duplicates and format combined columns
+    codes_df = (
+        codes_df.groupby("code")
+        .agg({"websites": lambda x: ", ".join(x), "active": format_active})
+        .reset_index()
+    )
+
+    return codes_df
+
+
+def format_active(list):
+    """Takes a list of strings and formats them into a single, numbered string where
+    each item is separated by a newline.
+
+    NOTE: Part of me hates that this function exists, but I couldn't fit it into a lambda.
+
+    Args:
+        list (list): List of strings.
+
+    Returns:
+        str: Formatted string.
+
+    Example:
+        ["Current (at https://www.example.com)", "2019-01-01 - 2020-01-01 (at https://www.example.com)"]
+            ->
+        "1. Current (at https://www.example.com)\n
+         2. 2019-01-01 - 2020-01-01 (at https://www.example.com)"
+
+    """
+    return "\n\n".join(f"{i + 1}. {item}" for i, item in enumerate(list))

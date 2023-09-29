@@ -27,13 +27,14 @@ def init_output(type):
     # Get current date and time for file name
     file_name = datetime.now().strftime("%d-%m-%Y(%H:%M:%S)")
 
-    # Create output file
+    # Create empty output file if type is not csv and return filename
     if type not in ["csv"]:
         with open(os.path.join("./output", f"{file_name}.{type}"), "w") as f:
             pass
 
         return "./output/" + f"{file_name}.{type}"
 
+    # If csv, create separate files for urls and codes and return filename
     with open(os.path.join("./output", f"{file_name}_urls.{type}"), "w") as f:
         pass
 
@@ -92,6 +93,7 @@ def get_urls_df(results):
     Returns:
         urls_df (pd.DataFrame): Pandas dataframe of results.
     """
+
     url_list = []
 
     for item in results:
@@ -102,20 +104,47 @@ def get_urls_df(results):
                     "UA_Code": info["current_UA_code"],
                     "GA_Code": info["current_GA_code"],
                     "GTM_Code": info["current_GTM_code"],
-                    "Archived_UA_Codes": info["archived_UA_codes"],
-                    "Archived_GA_Codes": info["archived_GA_codes"],
-                    "Archived_GTM_Codes": info["archived_GTM_codes"],
+                    "Archived_UA_Codes": format_archived_codes(
+                        info["archived_UA_codes"]
+                    ),
+                    "Archived_GA_Codes": format_archived_codes(
+                        info["archived_GA_codes"]
+                    ),
+                    "Archived_GTM_Codes": format_archived_codes(
+                        info["archived_GTM_codes"]
+                    ),
                 }
             )
 
     return pd.DataFrame(url_list)
 
 
+def format_archived_codes(archived_codes):
+    """Helper function to flatten archived codes and format them into a single string where
+    each item is numbered and separated by a newline.
+
+    Args:
+        archived_codes (dict): Dictionary of archived codes.
+
+    Returns:
+        str: Formatted string.
+    """
+
+    results = []
+    idx = 1
+
+    for code, range in archived_codes.items():
+        results.append(f"{idx}. {code} ({range['first_seen']} - {range['last_seen']})")
+        idx += 1
+
+    return "\n\n".join(results)
+
+
 def get_codes_df(results):
     """Converts the result dictionary into a Pandas dataframe and returns it.
 
     Args:
-        dict: Results from scraper.
+        results (dict): Results from scraper.
 
     Returns:
         codes_df (pd.DataFrame): Pandas dataframe of results.

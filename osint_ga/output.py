@@ -133,8 +133,8 @@ def format_archived_codes(archived_codes):
     results = []
     idx = 1
 
-    for code, range in archived_codes.items():
-        results.append(f"{idx}. {code} ({range['first_seen']} - {range['last_seen']})")
+    for code, timeframe in archived_codes.items():
+        results.append(f"{idx}. {code} ({timeframe['first_seen']} - {timeframe['last_seen']})")
         idx += 1
 
     return "\n\n".join(results)
@@ -206,8 +206,9 @@ def format_active(list):
     Example:
         ["Current (at https://www.example.com)", "2019-01-01 - 2020-01-01 (at https://www.example.com)"]
             ->
-        "1. Current (at https://www.example.com)\n
+        "1. Current (at https://www.example.com)\n\n
          2. 2019-01-01 - 2020-01-01 (at https://www.example.com)"
 
     """
+
     return "\n\n".join(f"{i + 1}. {item}" for i, item in enumerate(list))

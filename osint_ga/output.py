@@ -4,11 +4,12 @@ import os
 import pandas as pd
 
 
-def init_output(type):
+def init_output(type, output_dir="./output"):
     """Creates output directory and initializes empty output file.
 
     Args:
         type (str): csv/txt/json.
+        output_dir (str): Path to output directory. Defaults to ./output.
 
     Returns:
         None
@@ -21,27 +22,27 @@ def init_output(type):
         )
 
     # Create output directory if it doesn't exist
-    if not os.path.exists("output"):
-        os.makedirs("output")
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
     # Get current date and time for file name
     file_name = datetime.now().strftime("%d-%m-%Y(%H:%M:%S)")
 
     # Create empty output file if type is not csv and return filename
     if type not in ["csv"]:
-        with open(os.path.join("./output", f"{file_name}.{type}"), "w") as f:
+        with open(os.path.join(f"{output_dir}", f"{file_name}.{type}"), "w") as f:
             pass
 
-        return "./output/" + f"{file_name}.{type}"
+        return f"{output_dir}/" + f"{file_name}.{type}"
 
     # If csv, create separate files for urls and codes and return filename
-    with open(os.path.join("./output", f"{file_name}_urls.{type}"), "w") as f:
+    with open(os.path.join(f"{output_dir}", f"{file_name}_urls.{type}"), "w") as f:
         pass
 
-    with open(os.path.join("./output", f"{file_name}_codes.{type}"), "w") as f:
+    with open(os.path.join(f"{output_dir}", f"{file_name}_codes.{type}"), "w") as f:
         pass
 
-    return "./output/" + f"{file_name}.{type}"
+    return f"{output_dir}/" + f"{file_name}.{type}"
 
 
 def write_output(output_file, output_type, results):

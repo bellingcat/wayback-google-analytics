@@ -19,7 +19,7 @@ class OutputTestCase(TestCase):
     def setUp(self):
         """Create test data"""
         self.test_timestamp = "01-01-2023(12:00:00)"
-        self.test_path = "./output/"
+        self.test_path = "./test_output"
         self.valid_types = ["csv", "txt", "json", "xlsx"]
 
     def tearDown(self):
@@ -81,7 +81,7 @@ class OutputTestCase(TestCase):
                     self.test_path, f"{self.test_timestamp}.{type}"
                 )
 
-                returned_file_path = init_output(type)
+                returned_file_path = init_output(type=type, output_dir=self.test_path)
 
                 """Does it return correct file path for each type?"""
                 print(
@@ -110,3 +110,7 @@ class OutputTestCase(TestCase):
         """Should raise error with 'md'"""
         with self.assertRaises(ValueError):
             init_output("md")
+
+    def test_write_output(self):
+        """Does write_output write results to correct file?"""
+        pass

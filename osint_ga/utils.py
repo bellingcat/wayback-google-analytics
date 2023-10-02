@@ -1,8 +1,7 @@
 import asyncio
-import re
-
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import re
 
 from osint_ga.codes import get_UA_code, get_GA_code, get_GTM_code
 
@@ -24,7 +23,7 @@ COLLAPSE_OPTIONS = {
 
 
 def get_limit_from_frequency(frequency, start_date, end_date):
-    """Returns an appropriate limit for a given frequency.
+    """Returns an appropriate limit for a given frequency to be used w/ the CDX api.
 
     Args:
         frequency (str): Frequency (hourly, daily, monthly, yearly)
@@ -32,7 +31,7 @@ def get_limit_from_frequency(frequency, start_date, end_date):
         end_date (str): 14-digit timestamp for end of range
 
     Returns:
-        int: Limit
+        int: Limit for CDX api
     """
 
     # Get start date as datetime object or raise error if not provided
@@ -227,6 +226,9 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
         base_url (str): Base url for archive.org snapshot.
         timestamp (str): 14-digit timestamp.
         results (dict): Dictionary to add codes to (inherited from get_codes_from_snapshots()).
+
+    Returns:
+        None
     """
 
     # Use semaphore to limit number of concurrent requests
@@ -250,29 +252,47 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
                     for code in UA_codes:
                         if code not in results["UA_codes"]:
                             results["UA_codes"][code] = {}
-                            results["UA_codes"][code]["first_seen"] = get_date_from_timestamp(timestamp)
-                            results["UA_codes"][code]["last_seen"] = get_date_from_timestamp(timestamp)
+                            results["UA_codes"][code][
+                                "first_seen"
+                            ] = get_date_from_timestamp(timestamp)
+                            results["UA_codes"][code][
+                                "last_seen"
+                            ] = get_date_from_timestamp(timestamp)
 
                         if code in results["UA_codes"]:
-                            results["UA_codes"][code]["last_seen"] = get_date_from_timestamp(timestamp)
+                            results["UA_codes"][code][
+                                "last_seen"
+                            ] = get_date_from_timestamp(timestamp)
 
                     for code in GA_codes:
                         if code not in results["GA_codes"]:
                             results["GA_codes"][code] = {}
-                            results["GA_codes"][code]["first_seen"] = get_date_from_timestamp(timestamp)
-                            results["GA_codes"][code]["last_seen"] = get_date_from_timestamp(timestamp)
+                            results["GA_codes"][code][
+                                "first_seen"
+                            ] = get_date_from_timestamp(timestamp)
+                            results["GA_codes"][code][
+                                "last_seen"
+                            ] = get_date_from_timestamp(timestamp)
 
                         if code in results["GA_codes"]:
-                            results["GA_codes"][code]["last_seen"] = get_date_from_timestamp(timestamp)
+                            results["GA_codes"][code][
+                                "last_seen"
+                            ] = get_date_from_timestamp(timestamp)
 
                     for code in GTM_codes:
                         if code not in results["GTM_codes"]:
                             results["GTM_codes"][code] = {}
-                            results["GTM_codes"][code]["first_seen"] = get_date_from_timestamp(timestamp)
-                            results["GTM_codes"][code]["last_seen"] = get_date_from_timestamp(timestamp)
+                            results["GTM_codes"][code][
+                                "first_seen"
+                            ] = get_date_from_timestamp(timestamp)
+                            results["GTM_codes"][code][
+                                "last_seen"
+                            ] = get_date_from_timestamp(timestamp)
 
                         if code in results["GTM_codes"]:
-                            results["GTM_codes"][code]["last_seen"] = get_date_from_timestamp(timestamp)
+                            results["GTM_codes"][code][
+                                "last_seen"
+                            ] = get_date_from_timestamp(timestamp)
 
             # TODO: Add better/clearer error handling here
             except Exception as e:

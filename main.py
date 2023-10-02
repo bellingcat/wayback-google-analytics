@@ -1,6 +1,6 @@
 import aiohttp
-import asyncio
 import argparse
+import asyncio
 from osint_ga.utils import (
     get_limit_from_frequency,
     get_14_digit_timestamp,
@@ -16,6 +16,7 @@ from osint_ga.output import (
     write_output,
 )
 
+
 async def main(args):
     """Main function. Runs get_analytics_codes() and prints results.
 
@@ -25,10 +26,11 @@ async def main(args):
     Returns:
         None
     """
-    # If input file is provided, read urls from file
-    if args.input:
+
+    # If input_file is provided, read urls from file path
+    if args.input_file:
         try:
-            with open(args.input, "r") as f:
+            with open(args.input_file, "r") as f:
                 args.urls = f.read().splitlines()
         except FileNotFoundError:
             print("File not found. Please enter a valid file path.")
@@ -47,13 +49,15 @@ async def main(args):
 
     # Gets appropriate limit for given frequency & converts frequency to collapse option
     if args.frequency:
-        args.limit = get_limit_from_frequency(
-            frequency=args.frequency,
-            start_date=args.start_date,
-            end_date=args.end_date,
-        ) + 1
+        args.limit = (
+            get_limit_from_frequency(
+                frequency=args.frequency,
+                start_date=args.start_date,
+                end_date=args.end_date,
+            )
+            + 1
+        )
         args.frequency = COLLAPSE_OPTIONS[args.frequency]
-
 
     async with aiohttp.ClientSession() as session:
         results = await get_analytics_codes(
@@ -87,11 +91,12 @@ def setup_args():
 
     parser = argparse.ArgumentParser()
 
+    # Argparse group to prevent user from entering both --input_file and --urls
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
-        "--input",
+        "--input_file",
         default=None,
-        help="Enter a file path to a list of urls in a text or .csv file."
+        help="Enter a file path to a list of urls in a readable file type (e.g. .txt, .csv, .md)",
     )
     group.add_argument(
         "--urls",
@@ -100,8 +105,8 @@ def setup_args():
     )
     parser.add_argument(
         "--output",
-        default=None,
-        help="Enter a file path to save results to a .csv file.",
+        default="json",
+        help="Enter an output type to write results to file. Defaults to json.",
         choices=["csv", "txt", "json", "xlsx"],
     )
     parser.add_argument(

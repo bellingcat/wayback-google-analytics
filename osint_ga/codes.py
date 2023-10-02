@@ -1,5 +1,6 @@
-import re
 from bs4 import BeautifulSoup
+import re
+
 
 def get_UA_code(html):
     """Returns UA codes (w/o duplicates) from given html, or None if not found.
@@ -11,6 +12,7 @@ def get_UA_code(html):
         ["UA-12345678-1", "UA-12345678-2", ...]
     """
 
+    # Only search for codes in script tags
     script_tags = BeautifulSoup(html, "html.parser").find_all("script")
 
     # Regex pattern to find UA codes
@@ -40,6 +42,7 @@ def get_GA_code(html):
         ["G-1234567890", "G-1234567891", ...]
     """
 
+    # Only search for codes in script tags
     script_tags = BeautifulSoup(html, "html.parser").find_all("script")
 
     # Regex pattern to find GA codes
@@ -63,10 +66,12 @@ def get_GTM_code(html):
     """Returns GTM codes (w/o duplicates) from given html, or None if not found.
     Args:
         html (str): Raw html.
+
     Returns:
         ["GTM-1234567890", "GTM-1234567891", ...]
     """
 
+    # Only search for codes in script tags
     script_tags = BeautifulSoup(html, "html.parser").find_all("script")
 
     # This pattern

@@ -66,6 +66,7 @@ def get_GTM_code(html):
     """Returns GTM codes (w/o duplicates) from given html, or None if not found.
     Args:
         html (str): Raw html.
+
     Returns:
         ["GTM-1234567890", "GTM-1234567891", ...]
     """

@@ -1,4 +1,8 @@
+import os
 from unittest import TestCase
+from unittest.mock import patch, Mock
+from datetime import datetime
+from shutil import rmtree
 from osint_ga.output import (
     init_output,
     write_output,
@@ -14,6 +18,14 @@ class OutputTestCase(TestCase):
 
     def setUp(self):
         """Create test data"""
+        self.test_timestamp = "01-01-2023(12:00:00)"
+        self.test_path = "./output/"
+        self.valid_types = ["csv", "txt", "json", "xlsx"]
+
+    def tearDown(self):
+        """Removes any created directories after each test"""
+        if os.path.exists(self.test_path):
+            rmtree(self.test_path)
 
     def test_format_active(self):
         """Does format_active convert list of "active" values from df into formatted string?"""
@@ -54,3 +66,47 @@ class OutputTestCase(TestCase):
 
         self.assertEqual(format_archived_codes(archived_codes), expected)
         self.assertTrue(type(format_archived_codes(archived_codes)) is str)
+
+    @patch("osint_ga.output.datetime", autospec=True)
+    def test_init_output_valid_types(self, mock_datetime):
+        """Does init_output create a dict with correct keys?"""
+        mock_now = Mock(
+            return_value=datetime.strptime(self.test_timestamp, "%d-%m-%Y(%H:%M:%S)")
+        )
+        mock_datetime.now = mock_now
+
+        for type in self.valid_types:
+            with self.subTest(type=type):
+                expected_file_path = os.path.join(
+                    self.test_path, f"{self.test_timestamp}.{type}"
+                )
+
+                returned_file_path = init_output(type)
+
+                """Does it return correct file path for each type?"""
+                print(
+                    "returned = ", returned_file_path, "expected = ", expected_file_path
+                )
+                self.assertEqual(returned_file_path, expected_file_path)
+
+                """Does it create correct file for each type?"""
+                if type == "csv":
+                    self.assertTrue(
+                        os.path.exists(os.path.join(self.test_path, f"{self.test_timestamp}_codes.csv"))
+                    )
+                    self.assertTrue(
+                        os.path.exists(os.path.join(self.test_path, f"{self.test_timestamp}_urls.csv"))
+                    )
+                else:
+                    self.assertTrue(os.path.exists(returned_file_path))
+
+    def test_init_output_invalid_type(self):
+        """Does init_output raise error with incorrect type?"""
+
+        """Should raise error with 'docx'"""
+        with self.assertRaises(ValueError):
+            init_output("docx")
+
+        """Should raise error with 'md'"""
+        with self.assertRaises(ValueError):
+            init_output("md")

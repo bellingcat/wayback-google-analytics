@@ -51,6 +51,7 @@ git clone git@github.com:jclark1913/osint-google-analytics.git
 cd osint-google-analytics
 python -m venv venv
 source venv/bin/activate
+pip install -r requirements.txt
 ```
 
 3. Get a high-level overview:

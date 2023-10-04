@@ -2,6 +2,7 @@ import os
 from unittest import TestCase
 from unittest.mock import patch, Mock
 from datetime import datetime
+import json
 from shutil import rmtree
 from osint_ga.output import (
     init_output,
@@ -12,6 +13,8 @@ from osint_ga.output import (
     format_active,
 )
 
+import pandas as pd
+
 
 class OutputTestCase(TestCase):
     """Tests for output.py"""
@@ -21,6 +24,11 @@ class OutputTestCase(TestCase):
         self.test_timestamp = "01-01-2023(12:00:00)"
         self.test_path = "./test_output"
         self.valid_types = ["csv", "txt", "json", "xlsx"]
+        if not os.path.exists(self.test_path):
+            os.makedirs(self.test_path)
+        # self.test_json_file = os.path.join(self.test_path, f"{self.test_timestamp}.json")
+        # self.test_txt_file = os.path.join(self.test_path, f"{self.test_timestamp}.txt")
+        # self.test_csv_file = os.path.join(self.test_path, f"{self.test_timestamp}_urls.csv")
 
     def tearDown(self):
         """Removes any created directories after each test"""
@@ -92,10 +100,18 @@ class OutputTestCase(TestCase):
                 """Does it create correct file for each type?"""
                 if type == "csv":
                     self.assertTrue(
-                        os.path.exists(os.path.join(self.test_path, f"{self.test_timestamp}_codes.csv"))
+                        os.path.exists(
+                            os.path.join(
+                                self.test_path, f"{self.test_timestamp}_codes.csv"
+                            )
+                        )
                     )
                     self.assertTrue(
-                        os.path.exists(os.path.join(self.test_path, f"{self.test_timestamp}_urls.csv"))
+                        os.path.exists(
+                            os.path.join(
+                                self.test_path, f"{self.test_timestamp}_urls.csv"
+                            )
+                        )
                     )
                 else:
                     self.assertTrue(os.path.exists(returned_file_path))
@@ -111,6 +127,68 @@ class OutputTestCase(TestCase):
         with self.assertRaises(ValueError):
             init_output("md")
 
-    def test_write_output(self):
-        """Does write_output write results to correct file?"""
-        pass
+    def test_write_output_txt(self):
+        """Does write_output write results to correct text file?"""
+
+        test_file = "./test_output/test_file.txt"
+        test_results = {"test": "test"}
+        with open(test_file, "w") as f:
+            pass
+
+        write_output(test_file, "txt", test_results)
+
+        with open(test_file, "r") as f:
+            test_data = json.load(f)
+
+        os.remove(test_file)
+        self.assertEqual(test_data, test_results)
+
+    def test_write_output_json(self):
+        """Does write_output write results to correct json file?"""
+
+        test_file = "./test_output/test_file.json"
+        test_results = {"test": "test"}
+        with open(test_file, "w") as f:
+            pass
+
+        write_output(test_file, "json", test_results)
+
+        with open(test_file, "r") as f:
+            test_data = json.load(f)
+
+        os.remove(test_file)
+        self.assertEqual(test_data, test_results)
+
+    @patch("osint_ga.output.get_urls_df", autospec=True)
+    @patch("osint_ga.output.get_codes_df", autospec=True)
+    def test_write_output_csv(self, mock_urls, mock_codes):
+        """Does write_output write results to correct csv files?"""
+
+        test_file = "./test_output/test_file.csv"
+        test_file_urls = "./test_output/test_file_urls.csv"
+        test_file_codes = "./test_output/test_file_codes.csv"
+        test_results = {"test": "test"}
+        mock_urls.return_value = pd.DataFrame([test_results])
+        mock_codes.return_value = pd.DataFrame([test_results])
+
+        with open(test_file_urls, "w") as f:
+            pass
+
+        with open(test_file_codes, "w") as f:
+            pass
+
+        write_output(test_file, "csv", test_results)
+
+        test_data_urls = pd.read_csv(test_file_urls).to_dict(orient="records")[0]
+        test_data_codes = pd.read_csv(test_file_codes).to_dict(orient="records")[0]
+
+        os.remove(test_file_urls)
+        os.remove(test_file_codes)
+
+        self.assertEqual(test_data_urls, test_results)
+        self.assertEqual(test_data_codes, test_results)
+
+
+
+
+

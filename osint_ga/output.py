@@ -58,14 +58,10 @@ def write_output(output_file, output_type, results):
     """
 
     # If json or txt, write contents directly to file.
-    if output_type == "json":
+    if output_type == "json" or output_type == "txt":
         with open(output_file, "w") as f:
             json.dump(results, f, indent=4)
-
-    if output_type == "txt":
-        with open(output_file, "w") as f:
-            json.dump(results, f, indent=4)
-
+        return
     # If csv or xlsx, convert results to pandas dataframes.
     urls_df = get_urls_df(results)
     codes_df = get_codes_df(results)
@@ -135,7 +131,9 @@ def format_archived_codes(archived_codes):
     idx = 1
 
     for code, timeframe in archived_codes.items():
-        results.append(f"{idx}. {code} ({timeframe['first_seen']} - {timeframe['last_seen']})")
+        results.append(
+            f"{idx}. {code} ({timeframe['first_seen']} - {timeframe['last_seen']})"
+        )
         idx += 1
 
     return "\n\n".join(results)

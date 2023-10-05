@@ -1,9 +1,11 @@
-import os
-from unittest import TestCase
-from unittest.mock import patch, Mock
 from datetime import datetime
 import json
+import os
+import pandas as pd
+from unittest import TestCase
+from unittest.mock import patch, Mock
 from shutil import rmtree
+
 from osint_ga.output import (
     init_output,
     write_output,
@@ -12,8 +14,6 @@ from osint_ga.output import (
     format_archived_codes,
     format_active,
 )
-
-import pandas as pd
 
 
 class OutputTestCase(TestCase):
@@ -26,9 +26,6 @@ class OutputTestCase(TestCase):
         self.valid_types = ["csv", "txt", "json", "xlsx"]
         if not os.path.exists(self.test_path):
             os.makedirs(self.test_path)
-        # self.test_json_file = os.path.join(self.test_path, f"{self.test_timestamp}.json")
-        # self.test_txt_file = os.path.join(self.test_path, f"{self.test_timestamp}.txt")
-        # self.test_csv_file = os.path.join(self.test_path, f"{self.test_timestamp}_urls.csv")
 
     def tearDown(self):
         """Removes any created directories after each test"""
@@ -92,9 +89,6 @@ class OutputTestCase(TestCase):
                 returned_file_path = init_output(type=type, output_dir=self.test_path)
 
                 """Does it return correct file path for each type?"""
-                print(
-                    "returned = ", returned_file_path, "expected = ", expected_file_path
-                )
                 self.assertEqual(returned_file_path, expected_file_path)
 
                 """Does it create correct file for each type?"""

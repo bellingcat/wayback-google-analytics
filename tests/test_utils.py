@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from osint_ga.utils import get_limit_from_frequency
+from osint_ga.utils import get_limit_from_frequency, validate_dates
 
 class UtilsTestCase(TestCase):
     """Tests for utils.py"""
@@ -42,3 +42,31 @@ class UtilsTestCase(TestCase):
         with self.assertRaises(ValueError):
             get_limit_from_frequency(frequency=None, start_date="20120101000000", end_date="20130101000000")
             get_limit_from_frequency(frequency="weekly", start_date="20120101000000", end_date="20130101000000")
+
+    def test_validate_dates(self):
+        """Does validate_dates return True for valid dates?"""
+
+        """Returns True for valid dates"""
+        self.assertTrue(validate_dates(start_date="01/01/2012:12:00", end_date="02/01/2012:12:00"))
+        self.assertTrue(validate_dates(start_date="01/10/2023:12:00", end_date="03/11/2023:12:00"))
+
+        """Handles dates without 24hr time"""
+        self.assertTrue(validate_dates(start_date="01/01/2012", end_date="02/01/2012"))
+        self.assertTrue(validate_dates(start_date="01/10/2023", end_date="03/11/2023"))
+        self.assertTrue(validate_dates(start_date="01/01/2012:12:30", end_date="02/01/2012"))
+        self.assertTrue(validate_dates(start_date="01/01/2012", end_date="02/01/2012:01:00"))
+
+    def test_validate_dates_invalid(self):
+        """Does validate dates return False for invalid dates?"""
+
+        """Returns False for invalid dates"""
+        self.assertFalse(validate_dates(start_date="01/01/2012:12:00", end_date="01/01/2012:12:00"))
+        self.assertFalse(validate_dates(start_date="01/01/2012:12:00", end_date="01/01/2010:11:00"))
+        self.assertFalse(validate_dates(start_date="01/02/2012", end_date="01/01/2012:11:00"))
+        self.assertFalse(validate_dates(start_date="01/01/2012:12:30", end_date="02/01/2010"))
+
+        """Raises TypeError without valid start date"""
+        with self.assertRaises(TypeError):
+            validate_dates(start_date=None, end_date="01/01/2012:12:00")
+            validate_dates(start_date="01/01/2012:12:00", end_date=None)
+            validate_dates(start_date=None, end_date=None)

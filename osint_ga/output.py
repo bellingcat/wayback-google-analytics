@@ -82,10 +82,10 @@ def write_output(output_file, output_type, results):
 
 
 def get_urls_df(results):
-    """Flattens the results json and converts it into simple Pandas dataframe and returns it.
+    """Flattens the results json (list of dictionaries) and converts it into simple Pandas dataframe and returns it.
 
     Args:
-        dict: Results from scraper.
+        list: Results from scraper.
 
     Returns:
         urls_df (pd.DataFrame): Pandas dataframe of results.
@@ -127,6 +127,8 @@ def format_archived_codes(archived_codes):
         str: Formatted string.
     """
 
+    print("CALLED WITH = ", archived_codes)
+
     results = []
     idx = 1
 
@@ -136,14 +138,16 @@ def format_archived_codes(archived_codes):
         )
         idx += 1
 
+    print("RESULTS = ", results)
+
     return "\n\n".join(results)
 
 
 def get_codes_df(results):
-    """Converts the result dictionary into a Pandas dataframe and returns it.
+    """Flattens the result json (list of dictionries) into a Pandas dataframe and returns it.
 
     Args:
-        results (dict): Results from scraper.
+        results (list): Results from scraper.
 
     Returns:
         codes_df (pd.DataFrame): Pandas dataframe of results.

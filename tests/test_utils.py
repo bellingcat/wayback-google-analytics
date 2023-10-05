@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from osint_ga.utils import get_limit_from_frequency, validate_dates
+from osint_ga.utils import get_limit_from_frequency, validate_dates, get_14_digit_timestamp, get_date_from_timestamp, COLLAPSE_OPTIONS
 
 class UtilsTestCase(TestCase):
     """Tests for utils.py"""
@@ -70,3 +70,31 @@ class UtilsTestCase(TestCase):
             validate_dates(start_date=None, end_date="01/01/2012:12:00")
             validate_dates(start_date="01/01/2012:12:00", end_date=None)
             validate_dates(start_date=None, end_date=None)
+
+
+    def test_get_14_digit_timestamp(self):
+        """Does get_14_digit_timestamp return correct timestamp?"""
+
+        """Returns correct timestamp"""
+        self.assertEqual(get_14_digit_timestamp("01/01/2012:12:00"), "20120101120000")
+        self.assertEqual(get_14_digit_timestamp("01/01/2012:12:00"), "20120101120000")
+        self.assertEqual(get_14_digit_timestamp("01/01/2012:23:01"), "20120101230100")
+
+
+    def test_get_date_from_timestamp(self):
+        """Does get_date_from_timestamp return correct date?"""
+
+        """Returns correct date"""
+        self.assertEqual(get_date_from_timestamp("20120101120000"), "01/01/2012:12:00")
+        self.assertEqual(get_date_from_timestamp("20140101231200"), "01/01/2014:23:12")
+        self.assertEqual(get_date_from_timestamp("20230112010200"), "12/01/2023:01:02")
+
+    def test_COLLAPSE_OPTIONS(self):
+        """Does COLLAPSE_OPTIONS return correct frequency?"""
+
+        """Returns correct frequency"""
+        self.assertEqual(COLLAPSE_OPTIONS["yearly"], "4")
+        self.assertEqual(COLLAPSE_OPTIONS["monthly"], "6")
+        self.assertEqual(COLLAPSE_OPTIONS["daily"], "8")
+        self.assertEqual(COLLAPSE_OPTIONS["hourly"], "10")
+

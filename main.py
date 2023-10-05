@@ -1,9 +1,11 @@
 import aiohttp
 import argparse
 import asyncio
+from datetime import datetime
 from osint_ga.utils import (
     get_limit_from_frequency,
     get_14_digit_timestamp,
+    validate_dates,
     COLLAPSE_OPTIONS,
 )
 
@@ -39,6 +41,11 @@ async def main(args):
     # Throws ValueError immediately if output type is incorrect or there is an issue writing to file
     if args.output:
         output_file = init_output(args.output)
+
+    # Check if start_date is before end_date
+    if args.start_date and args.end_date:
+        if not validate_dates(args.start_date, args.end_date):
+            raise ValueError("Start date must be before end date.")
 
     # Update dates to 14-digit format
     if args.start_date:

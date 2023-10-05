@@ -188,7 +188,125 @@ class OutputTestCase(TestCase):
         self.assertEqual(test_data_urls, test_results)
         self.assertEqual(test_data_codes, test_results)
 
+    @patch("osint_ga.output.get_urls_df", autospec=True)
+    @patch("osint_ga.output.get_codes_df", autospec=True)
+    def test_write_output_xlsx(self, mock_urls, mock_codes):
+        """Does write_output write results to correct xlsx file?"""
 
+        test_file = "./test_output/test_file.xlsx"
+        test_results = {"test": "test"}
+        mock_urls.return_value = pd.DataFrame([test_results])
+        mock_codes.return_value = pd.DataFrame([test_results])
 
+        with open(test_file, "w") as f:
+            pass
 
+        write_output(test_file, "xlsx", test_results)
 
+        with pd.ExcelFile(test_file, engine="openpyxl") as xls:
+            sheet_names = xls.sheet_names
+
+            df_urls = xls.parse("URLs")
+            df_codes = xls.parse("Codes")
+
+        os.remove(test_file)
+
+        self.assertEqual(sheet_names, ["URLs", "Codes"])
+        self.assertEqual(df_urls.to_dict(orient="records")[0], test_results)
+        self.assertEqual(df_codes.to_dict(orient="records")[0], test_results)
+
+    def test_get_urls_df(self):
+        """Does get_urls_df create appropriate df from dict?"""
+
+        test_results = {
+            "someurl.com": {
+                "current_UA_code": "UA-12345678-1",
+                "current_GA_code": "G-1234567890",
+                "current_GTM_code": "GTM-12345678",
+                "archived_UA_codes": {
+                    "UA-12345678-1": {
+                        "first_seen": "01/01/2019",
+                        "last_seen": "01/01/2019",
+                    },
+                },
+                "archived_GA_codes": {
+                    "G-1234567890": {
+                        "first_seen": "01/01/2019",
+                        "last_seen": "01/01/2019",
+                    }
+                },
+                "archived_GTM_codes": {
+                    "GTM-12345678": {
+                        "first_seen": "01/01/2019",
+                        "last_seen": "01/01/2019",
+                    },
+                },
+            }
+        }
+
+        expected_results = {
+            "url": "someurl.com",
+            "UA_Code": "UA-12345678-1",
+            "GA_Code": "G-1234567890",
+            "GTM_Code": "GTM-12345678",
+            "Archived_UA_Codes": "1. UA-12345678-1 (01/01/2019 - 01/01/2019)",
+            "Archived_GA_Codes": "1. G-1234567890 (01/01/2019 - 01/01/2019)",
+            "Archived_GTM_Codes": "1. GTM-12345678 (01/01/2019 - 01/01/2019)",
+        }
+
+        actual_results = get_urls_df([test_results])
+
+        self.assertEqual(actual_results.to_dict(orient="records")[0], expected_results)
+        self.assertTrue(type(actual_results) is pd.DataFrame)
+
+    def test_get_codes_df(self):
+        """Does get_codes_df create appropriate df from dict?"""
+
+        test_results = {
+            "someurl.com": {
+                "current_UA_code": "UA-12345678-1",
+                "current_GA_code": "G-1234567890",
+                "current_GTM_code": "GTM-12345678",
+                "archived_UA_codes": {
+                    "UA-12345678-1": {
+                        "first_seen": "01/01/2019",
+                        "last_seen": "01/01/2019",
+                    },
+                },
+                "archived_GA_codes": {
+                    "G-1234567890": {
+                        "first_seen": "01/01/2019",
+                        "last_seen": "01/01/2019",
+                    }
+                },
+                "archived_GTM_codes": {
+                    "GTM-12345678": {
+                        "first_seen": "01/01/2019",
+                        "last_seen": "01/01/2019",
+                    },
+                },
+            }
+        }
+
+        expected_results = [
+            {
+                "code": "G-1234567890",
+                "websites": "someurl.com",
+                "active": "1. 01/01/2019 - 01/01/2019(at someurl.com)",
+            },
+            {
+                "code": "GTM-12345678",
+                "websites": "someurl.com",
+                "active": "1. 01/01/2019 - 01/01/2019(at someurl.com)",
+            },
+            {
+                "code": "UA-12345678-1",
+                "websites": "someurl.com",
+                "active": "1. 01/01/2019 - 01/01/2019(at someurl.com)",
+            },
+        ]
+
+        actual_results = get_codes_df([test_results])
+
+        self.assertEqual(actual_results.to_dict(orient="records"), expected_results)
+        self.assertTrue(type(actual_results) is pd.DataFrame)

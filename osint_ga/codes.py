@@ -19,14 +19,12 @@ def get_UA_code(html):
     pattern = re.compile(r"UA-[\d-]{5,15}")
 
     # Find all UA codes in html
-    try:
-        UA_codes = []
-        for script in script_tags:
-            curr_codes = pattern.findall(script.text)
-            UA_codes += curr_codes
-    except Exception as e:
-        print(e)
-        return None
+
+    UA_codes = []
+    for script in script_tags:
+        curr_codes = pattern.findall(script.text)
+        UA_codes += curr_codes
+
 
     # Remove duplicates and return
     return list(set(UA_codes))
@@ -49,14 +47,11 @@ def get_GA_code(html):
     pattern = re.compile(r"G-[\d-]{5,15}")
 
     # Find all GA codes in html or return None
-    try:
-        GA_codes = []
-        for script in script_tags:
-            curr_codes = pattern.findall(script.text)
-            GA_codes += curr_codes
-    except Exception as e:
-        print(e)
-        return None
+
+    GA_codes = []
+    for script in script_tags:
+        curr_codes = pattern.findall(script.text)
+        GA_codes += curr_codes
 
     # Remove duplicates and return
     return list(set(GA_codes))
@@ -78,14 +73,12 @@ def get_GTM_code(html):
     pattern = re.compile(r"GTM-[\w-]{1,15}")
 
     # Find all GTM codes in html or return None
-    try:
-        GTM_codes = []
-        for script in script_tags:
-            curr_codes = pattern.findall(script.text)
-            GTM_codes += curr_codes
-    except Exception as e:
-        print(e)
-        return None
+
+    GTM_codes = []
+    for script in script_tags:
+        curr_codes = pattern.findall(script.text)
+        GTM_codes += curr_codes
+
 
     # Remove duplicates and return
     return list(set(GTM_codes))

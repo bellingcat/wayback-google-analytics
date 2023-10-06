@@ -41,6 +41,7 @@ class UtilsTestCase(TestCase):
         """Raises ValueError without valid frequency"""
         with self.assertRaises(ValueError):
             get_limit_from_frequency(frequency=None, start_date="20120101000000", end_date="20130101000000")
+        with self.assertRaises(ValueError):
             get_limit_from_frequency(frequency="weekly", start_date="20120101000000", end_date="20130101000000")
 
     def test_validate_dates(self):
@@ -68,7 +69,9 @@ class UtilsTestCase(TestCase):
         """Raises TypeError without valid start date"""
         with self.assertRaises(TypeError):
             validate_dates(start_date=None, end_date="01/01/2012:12:00")
+        with self.assertRaises(TypeError):
             validate_dates(start_date="01/01/2012:12:00", end_date=None)
+        with self.assertRaises(TypeError):
             validate_dates(start_date=None, end_date=None)
 
 

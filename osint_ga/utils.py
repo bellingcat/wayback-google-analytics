@@ -73,6 +73,7 @@ def get_limit_from_frequency(frequency, start_date, end_date):
         f"Invalid frequency: {frequency}. Please use hourly, daily, monthly, or yearly."
     )
 
+
 def validate_dates(start_date, end_date):
     """Returns True if start_date is before end_date, False otherwise.
 
@@ -101,6 +102,7 @@ def validate_dates(start_date, end_date):
 
     # Return False if start_date is after end_date
     return False
+
 
 def get_date_from_timestamp(timestamp):
     """Takes a 14-digit timestamp (YYYYmmddHHMMSS) and returns a date (dd/mm/YYYY:HH:MM).

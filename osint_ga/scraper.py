@@ -5,9 +5,12 @@ from osint_ga.codes import (
     get_GA_code,
     get_GTM_code,
 )
-from osint_ga.utils import (
+from osint_ga.async_utils import (
     get_snapshot_timestamps,
     get_codes_from_snapshots,
+)
+
+from osint_ga.utils import (
     DEFAULT_HEADERS,
 )
 
@@ -160,6 +163,7 @@ async def get_analytics_codes(
     """
 
     # Comprehension to create list of tasks for asyncio.gather()
+    print("2. GETTING TASKS in MAIN")
     tasks = [
         process_url(
             session=session,

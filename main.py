@@ -1,7 +1,7 @@
 import aiohttp
 import argparse
 import asyncio
-from datetime import datetime
+
 from osint_ga.utils import (
     get_limit_from_frequency,
     get_14_digit_timestamp,

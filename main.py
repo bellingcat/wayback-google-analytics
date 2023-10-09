@@ -101,38 +101,45 @@ def setup_args():
     # Argparse group to prevent user from entering both --input_file and --urls
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
+        "-i",
         "--input_file",
         default=None,
         help="Enter a file path to a list of urls in a readable file type (e.g. .txt, .csv, .md)",
     )
     group.add_argument(
+        "-u",
         "--urls",
         nargs="+",
         help="Enter a list of urls separated by spaces to get their UA/GA codes (e.g. --urls https://www.google.com https://www.facebook.com)",
     )
     parser.add_argument(
+        "-o",
         "--output",
         default="json",
         help="Enter an output type to write results to file. Defaults to json.",
         choices=["csv", "txt", "json", "xlsx"],
     )
     parser.add_argument(
+        "-s",
         "--start_date",
         default="01/10/2012:00:00",
         help="Start date for time range (dd/mm/YYYY:HH:MM) Defaults to 01/10/2012:00:00, when UA codes were adopted.",
     )
     parser.add_argument(
+        "-e",
         "--end_date",
         default=None,
         help="End date for time range (dd/mm/YYYY:HH:MM). Defaults to None.",
     )
     parser.add_argument(
+        "-f",
         "--frequency",
         default=None,
         help="Can limit snapshots to remove duplicates (1 per hr, day, month, etc). Defaults to None.",
         choices=["yearly", "monthly", "daily", "hourly"],
     )
     parser.add_argument(
+        "-l",
         "--limit",
         default=-100,
         help="Limits number of snapshots returned. Defaults to -100 (most recent 100 snapshots).",

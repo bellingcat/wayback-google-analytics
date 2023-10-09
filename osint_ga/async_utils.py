@@ -130,7 +130,6 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
         ) as response:
             try:
                 html = await response.text()
-                print("HTML = ", html)
 
                 print("GETTING CODES FOR", base_url.format(timestamp=timestamp))
 

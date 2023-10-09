@@ -100,8 +100,6 @@ class AsyncUtilsTestCase(asynctest.TestCase):
                 results=results,
             )
 
-        print("RESULTS=", results)
-
         """Does it update results accordingly?"""
         self.assertIn("UA-12345678-1", results["UA_codes"])
         self.assertIn("G-12345678", results["GA_codes"])

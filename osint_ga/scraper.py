@@ -80,16 +80,16 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
 
     # Get html + current codes
     html = await get_html(session, url)
-    print("GETTING CURRENT CODES", url)
+    print("Retrieving current codes for: ", url)
     if html:
         curr_entry[url]["current_UA_code"] = get_UA_code(html)
         curr_entry[url]["current_GA_code"] = get_GA_code(html)
         curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
         curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
-        print("FINISH CURRENT CODES", url)
+        print("Finished gathering current codes for: ", url)
 
     # Get snapshots for Wayback Machine
-    print("GETTING ARCHIVED CODES", url)
+    print("Retrieving archived codes for: ", url)
     archived_snapshots = await get_snapshot_timestamps(
         session=session,
         url=url,
@@ -107,7 +107,7 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
     curr_entry[url]["archived_GA_codes"] = archived_codes["GA_codes"]
     curr_entry[url]["archived_GTM_codes"] = archived_codes["GTM_codes"]
 
-    print("FINISH ARCHIVED CODES", url)
+    print("Finished retrieving updated codes for: ", url)
 
     return curr_entry
 
@@ -163,7 +163,7 @@ async def get_analytics_codes(
     """
 
     # Comprehension to create list of tasks for asyncio.gather()
-    print("2. GETTING TASKS in MAIN")
+
     tasks = [
         process_url(
             session=session,

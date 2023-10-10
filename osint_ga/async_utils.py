@@ -185,9 +185,9 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
                             results["GTM_codes"][code][
                                 "last_seen"
                             ] = get_date_from_timestamp(timestamp)
-            # TODO: Add better/clearer error handling here
+
             except Exception as e:
-                print("ERROR in ASYNC ARCHIVE CODES", e)
+                print(f"Error retrieving codes from {base_url.format(timestamp=timestamp)}: ", e)
                 return None
 
         print("Finish gathering codes for: ", base_url.format(timestamp=timestamp))

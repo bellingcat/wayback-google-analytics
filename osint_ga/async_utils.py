@@ -46,7 +46,7 @@ async def get_snapshot_timestamps(
     if end_date:
         cdx_url += f"&to={end_date}"
 
-    print("CDX url= ", cdx_url)
+    print("CDX url: ", cdx_url)
 
     # Regex pattern to find 14-digit timestamps
     pattern = re.compile(r"\d{14}")
@@ -55,7 +55,7 @@ async def get_snapshot_timestamps(
     async with session.get(cdx_url, headers=DEFAULT_HEADERS) as response:
         timestamps = pattern.findall(await response.text())
 
-    print("TIMESTAMPS", timestamps)
+    print("Timestamps from CDX api: ", timestamps)
 
     # Return sorted timestamps
     return sorted(timestamps)
@@ -131,7 +131,7 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
             try:
                 html = await response.text()
 
-                print("GETTING CODES FOR", base_url.format(timestamp=timestamp))
+                print("Retrieving codes from url: ", base_url.format(timestamp=timestamp))
 
                 if html:
                     # Get UA/GA codes from html
@@ -190,4 +190,4 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
                 print("ERROR in ASYNC ARCHIVE CODES", e)
                 return None
 
-        print("FINISH CODES FOR", base_url.format(timestamp=timestamp))
+        print("Finish gathering codes for: ", base_url.format(timestamp=timestamp))

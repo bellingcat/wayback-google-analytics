@@ -58,14 +58,10 @@ def write_output(output_file, output_type, results):
     """
 
     # If json or txt, write contents directly to file.
-    if output_type == "json":
+    if output_type == "json" or output_type == "txt":
         with open(output_file, "w") as f:
             json.dump(results, f, indent=4)
-
-    if output_type == "txt":
-        with open(output_file, "w") as f:
-            json.dump(results, f, indent=4)
-
+        return
     # If csv or xlsx, convert results to pandas dataframes.
     urls_df = get_urls_df(results)
     codes_df = get_codes_df(results)
@@ -86,10 +82,10 @@ def write_output(output_file, output_type, results):
 
 
 def get_urls_df(results):
-    """Flattens the results json and converts it into simple Pandas dataframe and returns it.
+    """Flattens the results json (list of dictionaries) and converts it into simple Pandas dataframe and returns it.
 
     Args:
-        dict: Results from scraper.
+        list: Results from scraper.
 
     Returns:
         urls_df (pd.DataFrame): Pandas dataframe of results.
@@ -135,17 +131,19 @@ def format_archived_codes(archived_codes):
     idx = 1
 
     for code, timeframe in archived_codes.items():
-        results.append(f"{idx}. {code} ({timeframe['first_seen']} - {timeframe['last_seen']})")
+        results.append(
+            f"{idx}. {code} ({timeframe['first_seen']} - {timeframe['last_seen']})"
+        )
         idx += 1
 
     return "\n\n".join(results)
 
 
 def get_codes_df(results):
-    """Converts the result dictionary into a Pandas dataframe and returns it.
+    """Flattens the result json (list of dictionries) into a Pandas dataframe and returns it.
 
     Args:
-        results (dict): Results from scraper.
+        results (list): Results from scraper.
 
     Returns:
         codes_df (pd.DataFrame): Pandas dataframe of results.
@@ -169,8 +167,6 @@ def get_codes_df(results):
                         )
                 if type(code) is dict:
                     for c in code:
-                        print("dict code = ", c)
-                        print("code itself = ", code)
                         code_list.append(
                             {
                                 "code": c,
@@ -195,8 +191,6 @@ def get_codes_df(results):
 def format_active(list):
     """Takes a list of strings and formats them into a single, numbered string where
     each item is separated by a newline.
-
-    NOTE: Part of me hates that this function exists, but I couldn't fit it into a lambda.
 
     Args:
         list (list): List of strings.

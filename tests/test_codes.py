@@ -76,6 +76,8 @@ class CodesTestCase(TestCase):
         </html>
         """
 
+        self.test_errorful_html = "<html></html>"
+
     def test_get_single_UA_code(self):
         """Test get_UA_code w/ single code"""
 

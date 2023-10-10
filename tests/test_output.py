@@ -1,8 +1,11 @@
+from datetime import datetime
+import json
 import os
+import pandas as pd
 from unittest import TestCase
 from unittest.mock import patch, Mock
-from datetime import datetime
 from shutil import rmtree
+
 from osint_ga.output import (
     init_output,
     write_output,
@@ -21,6 +24,8 @@ class OutputTestCase(TestCase):
         self.test_timestamp = "01-01-2023(12:00:00)"
         self.test_path = "./test_output"
         self.valid_types = ["csv", "txt", "json", "xlsx"]
+        if not os.path.exists(self.test_path):
+            os.makedirs(self.test_path)
 
     def tearDown(self):
         """Removes any created directories after each test"""
@@ -84,18 +89,23 @@ class OutputTestCase(TestCase):
                 returned_file_path = init_output(type=type, output_dir=self.test_path)
 
                 """Does it return correct file path for each type?"""
-                print(
-                    "returned = ", returned_file_path, "expected = ", expected_file_path
-                )
                 self.assertEqual(returned_file_path, expected_file_path)
 
                 """Does it create correct file for each type?"""
                 if type == "csv":
                     self.assertTrue(
-                        os.path.exists(os.path.join(self.test_path, f"{self.test_timestamp}_codes.csv"))
+                        os.path.exists(
+                            os.path.join(
+                                self.test_path, f"{self.test_timestamp}_codes.csv"
+                            )
+                        )
                     )
                     self.assertTrue(
-                        os.path.exists(os.path.join(self.test_path, f"{self.test_timestamp}_urls.csv"))
+                        os.path.exists(
+                            os.path.join(
+                                self.test_path, f"{self.test_timestamp}_urls.csv"
+                            )
+                        )
                     )
                 else:
                     self.assertTrue(os.path.exists(returned_file_path))
@@ -111,6 +121,186 @@ class OutputTestCase(TestCase):
         with self.assertRaises(ValueError):
             init_output("md")
 
-    def test_write_output(self):
-        """Does write_output write results to correct file?"""
-        pass
+    def test_write_output_txt(self):
+        """Does write_output write results to correct text file?"""
+
+        test_file = "./test_output/test_file.txt"
+        test_results = {"test": "test"}
+        with open(test_file, "w") as f:
+            pass
+
+        write_output(test_file, "txt", test_results)
+
+        with open(test_file, "r") as f:
+            test_data = json.load(f)
+
+        os.remove(test_file)
+        self.assertEqual(test_data, test_results)
+
+    def test_write_output_json(self):
+        """Does write_output write results to correct json file?"""
+
+        test_file = "./test_output/test_file.json"
+        test_results = {"test": "test"}
+        with open(test_file, "w") as f:
+            pass
+
+        write_output(test_file, "json", test_results)
+
+        with open(test_file, "r") as f:
+            test_data = json.load(f)
+
+        os.remove(test_file)
+        self.assertEqual(test_data, test_results)
+
+    @patch("osint_ga.output.get_urls_df", autospec=True)
+    @patch("osint_ga.output.get_codes_df", autospec=True)
+    def test_write_output_csv(self, mock_urls, mock_codes):
+        """Does write_output write results to correct csv files?"""
+
+        test_file = "./test_output/test_file.csv"
+        test_file_urls = "./test_output/test_file_urls.csv"
+        test_file_codes = "./test_output/test_file_codes.csv"
+        test_results = {"test": "test"}
+        mock_urls.return_value = pd.DataFrame([test_results])
+        mock_codes.return_value = pd.DataFrame([test_results])
+
+        with open(test_file_urls, "w") as f:
+            pass
+
+        with open(test_file_codes, "w") as f:
+            pass
+
+        write_output(test_file, "csv", test_results)
+
+        test_data_urls = pd.read_csv(test_file_urls).to_dict(orient="records")[0]
+        test_data_codes = pd.read_csv(test_file_codes).to_dict(orient="records")[0]
+
+        os.remove(test_file_urls)
+        os.remove(test_file_codes)
+
+        self.assertEqual(test_data_urls, test_results)
+        self.assertEqual(test_data_codes, test_results)
+
+    @patch("osint_ga.output.get_urls_df", autospec=True)
+    @patch("osint_ga.output.get_codes_df", autospec=True)
+    def test_write_output_xlsx(self, mock_urls, mock_codes):
+        """Does write_output write results to correct xlsx file?"""
+
+        test_file = "./test_output/test_file.xlsx"
+        test_results = {"test": "test"}
+        mock_urls.return_value = pd.DataFrame([test_results])
+        mock_codes.return_value = pd.DataFrame([test_results])
+
+        with open(test_file, "w") as f:
+            pass
+
+        write_output(test_file, "xlsx", test_results)
+
+        with pd.ExcelFile(test_file, engine="openpyxl") as xls:
+            sheet_names = xls.sheet_names
+
+            df_urls = xls.parse("URLs")
+            df_codes = xls.parse("Codes")
+
+        os.remove(test_file)
+
+        self.assertEqual(sheet_names, ["URLs", "Codes"])
+        self.assertEqual(df_urls.to_dict(orient="records")[0], test_results)
+        self.assertEqual(df_codes.to_dict(orient="records")[0], test_results)
+
+    def test_get_urls_df(self):
+        """Does get_urls_df create appropriate df from dict?"""
+
+        test_results = {
+            "someurl.com": {
+                "current_UA_code": "UA-12345678-1",
+                "current_GA_code": "G-1234567890",
+                "current_GTM_code": "GTM-12345678",
+                "archived_UA_codes": {
+                    "UA-12345678-1": {
+                        "first_seen": "01/01/2019",
+                        "last_seen": "01/01/2019",
+                    },
+                },
+                "archived_GA_codes": {
+                    "G-1234567890": {
+                        "first_seen": "01/01/2019",
+                        "last_seen": "01/01/2019",
+                    }
+                },
+                "archived_GTM_codes": {
+                    "GTM-12345678": {
+                        "first_seen": "01/01/2019",
+                        "last_seen": "01/01/2019",
+                    },
+                },
+            }
+        }
+
+        expected_results = {
+            "url": "someurl.com",
+            "UA_Code": "UA-12345678-1",
+            "GA_Code": "G-1234567890",
+            "GTM_Code": "GTM-12345678",
+            "Archived_UA_Codes": "1. UA-12345678-1 (01/01/2019 - 01/01/2019)",
+            "Archived_GA_Codes": "1. G-1234567890 (01/01/2019 - 01/01/2019)",
+            "Archived_GTM_Codes": "1. GTM-12345678 (01/01/2019 - 01/01/2019)",
+        }
+
+        actual_results = get_urls_df([test_results])
+
+        self.assertEqual(actual_results.to_dict(orient="records")[0], expected_results)
+        self.assertTrue(type(actual_results) is pd.DataFrame)
+
+    def test_get_codes_df(self):
+        """Does get_codes_df create appropriate df from dict?"""
+
+        test_results = {
+            "someurl.com": {
+                "current_UA_code": "UA-12345678-1",
+                "current_GA_code": "G-1234567890",
+                "current_GTM_code": "GTM-12345678",
+                "archived_UA_codes": {
+                    "UA-12345678-1": {
+                        "first_seen": "01/01/2019",
+                        "last_seen": "01/01/2019",
+                    },
+                },
+                "archived_GA_codes": {
+                    "G-1234567890": {
+                        "first_seen": "01/01/2019",
+                        "last_seen": "01/01/2019",
+                    }
+                },
+                "archived_GTM_codes": {
+                    "GTM-12345678": {
+                        "first_seen": "01/01/2019",
+                        "last_seen": "01/01/2019",
+                    },
+                },
+            }
+        }
+
+        expected_results = [
+            {
+                "code": "G-1234567890",
+                "websites": "someurl.com",
+                "active": "1. 01/01/2019 - 01/01/2019(at someurl.com)",
+            },
+            {
+                "code": "GTM-12345678",
+                "websites": "someurl.com",
+                "active": "1. 01/01/2019 - 01/01/2019(at someurl.com)",
+            },
+            {
+                "code": "UA-12345678-1",
+                "websites": "someurl.com",
+                "active": "1. 01/01/2019 - 01/01/2019(at someurl.com)",
+            },
+        ]
+
+        actual_results = get_codes_df([test_results])
+
+        self.assertEqual(actual_results.to_dict(orient="records"), expected_results)
+        self.assertTrue(type(actual_results) is pd.DataFrame)

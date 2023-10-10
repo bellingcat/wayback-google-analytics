@@ -127,8 +127,6 @@ def format_archived_codes(archived_codes):
         str: Formatted string.
     """
 
-    print("CALLED WITH = ", archived_codes)
-
     results = []
     idx = 1
 
@@ -137,8 +135,6 @@ def format_archived_codes(archived_codes):
             f"{idx}. {code} ({timeframe['first_seen']} - {timeframe['last_seen']})"
         )
         idx += 1
-
-    print("RESULTS = ", results)
 
     return "\n\n".join(results)
 
@@ -171,8 +167,6 @@ def get_codes_df(results):
                         )
                 if type(code) is dict:
                     for c in code:
-                        print("dict code = ", c)
-                        print("code itself = ", code)
                         code_list.append(
                             {
                                 "code": c,
@@ -197,8 +191,6 @@ def get_codes_df(results):
 def format_active(list):
     """Takes a list of strings and formats them into a single, numbered string where
     each item is separated by a newline.
-
-    NOTE: Part of me hates that this function exists, but I couldn't fit it into a lambda.
 
     Args:
         list (list): List of strings.

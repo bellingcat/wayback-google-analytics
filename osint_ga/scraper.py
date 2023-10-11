@@ -107,7 +107,7 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
     curr_entry[url]["archived_GA_codes"] = archived_codes["GA_codes"]
     curr_entry[url]["archived_GTM_codes"] = archived_codes["GTM_codes"]
 
-    print("Finished retrieving updated codes for: ", url)
+    print("Finished retrieving archived codes for: ", url)
 
     return curr_entry
 

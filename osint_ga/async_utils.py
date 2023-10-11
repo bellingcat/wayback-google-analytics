@@ -107,6 +107,16 @@ async def get_codes_from_snapshots(session, url, timestamps):
         for timestamp in timestamps
     ]
     await asyncio.gather(*tasks)
+
+    for code_type in results:
+        for code in results[code_type]:
+            results[code_type][code]["first_seen"] = get_date_from_timestamp(
+                results[code_type][code]["first_seen"]
+            )
+            results[code_type][code]["last_seen"] = get_date_from_timestamp(
+                results[code_type][code]["last_seen"]
+            )
+
     return results
 
 
@@ -131,7 +141,9 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
             try:
                 html = await response.text()
 
-                print("Retrieving codes from url: ", base_url.format(timestamp=timestamp))
+                print(
+                    "Retrieving codes from url: ", base_url.format(timestamp=timestamp)
+                )
 
                 if html:
                     # Get UA/GA codes from html
@@ -144,50 +156,44 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
                     for code in UA_codes:
                         if code not in results["UA_codes"]:
                             results["UA_codes"][code] = {}
-                            results["UA_codes"][code][
-                                "first_seen"
-                            ] = get_date_from_timestamp(timestamp)
-                            results["UA_codes"][code][
-                                "last_seen"
-                            ] = get_date_from_timestamp(timestamp)
+                            results["UA_codes"][code]["first_seen"] = timestamp
+                            results["UA_codes"][code]["last_seen"] = timestamp
 
                         if code in results["UA_codes"]:
-                            results["UA_codes"][code][
-                                "last_seen"
-                            ] = get_date_from_timestamp(timestamp)
+                            if timestamp < results["UA_codes"][code]["first_seen"]:
+                                results["UA_codes"][code]["first_seen"] = timestamp
+                            if timestamp > results["UA_codes"][code]["last_seen"]:
+                                results["UA_codes"][code]["last_seen"] = timestamp
 
                     for code in GA_codes:
                         if code not in results["GA_codes"]:
                             results["GA_codes"][code] = {}
-                            results["GA_codes"][code][
-                                "first_seen"
-                            ] = get_date_from_timestamp(timestamp)
-                            results["GA_codes"][code][
-                                "last_seen"
-                            ] = get_date_from_timestamp(timestamp)
+                            results["GA_codes"][code]["first_seen"] = timestamp
+                            results["GA_codes"][code]["last_seen"] = timestamp
 
                         if code in results["GA_codes"]:
-                            results["GA_codes"][code][
-                                "last_seen"
-                            ] = get_date_from_timestamp(timestamp)
+                            if timestamp < results["GA_codes"][code]["first_seen"]:
+                                results["GA_codes"][code]["first_seen"] = timestamp
+                            if timestamp > results["GA_codes"][code]["last_seen"]:
+                                results["GA_codes"][code]["last_seen"] = timestamp
 
                     for code in GTM_codes:
                         if code not in results["GTM_codes"]:
                             results["GTM_codes"][code] = {}
-                            results["GTM_codes"][code][
-                                "first_seen"
-                            ] = get_date_from_timestamp(timestamp)
-                            results["GTM_codes"][code][
-                                "last_seen"
-                            ] = get_date_from_timestamp(timestamp)
+                            results["GTM_codes"][code]["first_seen"] = timestamp
+                            results["GTM_codes"][code]["last_seen"] = timestamp
 
                         if code in results["GTM_codes"]:
-                            results["GTM_codes"][code][
-                                "last_seen"
-                            ] = get_date_from_timestamp(timestamp)
+                            if timestamp < results["GTM_codes"][code]["first_seen"]:
+                                results["GTM_codes"][code]["first_seen"] = timestamp
+                            if timestamp > results["GTM_codes"][code]["last_seen"]:
+                                results["GTM_codes"][code]["last_seen"] = timestamp
 
             except Exception as e:
-                print(f"Error retrieving codes from {base_url.format(timestamp=timestamp)}: ", e)
+                print(
+                    f"Error retrieving codes from {base_url.format(timestamp=timestamp)}: ",
+                    e,
+                )
                 return None
 
         print("Finish gathering codes for: ", base_url.format(timestamp=timestamp))

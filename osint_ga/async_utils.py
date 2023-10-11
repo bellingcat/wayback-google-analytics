@@ -168,12 +168,8 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
                     for code in GA_codes:
                         if code not in results["GA_codes"]:
                             results["GA_codes"][code] = {}
-                            results["GA_codes"][code][
-                                "first_seen"
-                            ] = timestamp
-                            results["GA_codes"][code][
-                                "last_seen"
-                            ] = timestamp
+                            results["GA_codes"][code]["first_seen"] = timestamp
+                            results["GA_codes"][code]["last_seen"] = timestamp
 
                         if code in results["GA_codes"]:
                             if timestamp < results["GA_codes"][code]["first_seen"]:
@@ -184,12 +180,8 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
                     for code in GTM_codes:
                         if code not in results["GTM_codes"]:
                             results["GTM_codes"][code] = {}
-                            results["GTM_codes"][code][
-                                "first_seen"
-                            ] = timestamp
-                            results["GTM_codes"][code][
-                                "last_seen"
-                            ] = timestamp
+                            results["GTM_codes"][code]["first_seen"] = timestamp
+                            results["GTM_codes"][code]["last_seen"] = timestamp
 
                         if code in results["GTM_codes"]:
                             if timestamp < results["GTM_codes"][code]["first_seen"]:

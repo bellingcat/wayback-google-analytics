@@ -1,16 +1,16 @@
 import aiohttp
 import asyncio
-from osint_ga.codes import (
+from wayback_google_analytics.codes import (
     get_UA_code,
     get_GA_code,
     get_GTM_code,
 )
-from osint_ga.async_utils import (
+from wayback_google_analytics.async_utils import (
     get_snapshot_timestamps,
     get_codes_from_snapshots,
 )
 
-from osint_ga.utils import (
+from wayback_google_analytics.utils import (
     DEFAULT_HEADERS,
 )
 

@@ -1,7 +1,7 @@
 import asyncio
 import re
-from osint_ga.codes import get_UA_code, get_GA_code, get_GTM_code
-from osint_ga.utils import get_date_from_timestamp, DEFAULT_HEADERS
+from wayback_google_analytics.codes import get_UA_code, get_GA_code, get_GTM_code
+from wayback_google_analytics.utils import get_date_from_timestamp, DEFAULT_HEADERS
 
 # Semaphore to limit number of concurrent requests (10-15 appears to work fine. 20+ causes 443 error from web.archive.org)
 sem = asyncio.Semaphore(10)

@@ -2,18 +2,18 @@ import aiohttp
 import argparse
 import asyncio
 
-from osint_ga.utils import (
+from wayback_google_analytics.utils import (
     get_limit_from_frequency,
     get_14_digit_timestamp,
     validate_dates,
     COLLAPSE_OPTIONS,
 )
 
-from osint_ga.scraper import (
+from wayback_google_analytics.scraper import (
     get_analytics_codes,
 )
 
-from osint_ga.output import (
+from wayback_google_analytics.output import (
     init_output,
     write_output,
 )

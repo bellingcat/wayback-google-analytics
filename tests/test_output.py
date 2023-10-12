@@ -6,7 +6,7 @@ from unittest import TestCase
 from unittest.mock import patch, Mock
 from shutil import rmtree
 
-from osint_ga.output import (
+from wayback_google_analytics.output import (
     init_output,
     write_output,
     get_codes_df,

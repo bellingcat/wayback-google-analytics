@@ -2,7 +2,7 @@ import asynctest
 from asynctest.mock import patch, MagicMock
 import aiohttp
 
-from osint_ga.async_utils import (
+from wayback_google_analytics.async_utils import (
     get_codes_from_single_timestamp,
     get_codes_from_snapshots,
     get_snapshot_timestamps,

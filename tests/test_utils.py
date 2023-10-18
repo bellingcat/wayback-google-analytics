@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from osint_ga.utils import get_limit_from_frequency, validate_dates, get_14_digit_timestamp, get_date_from_timestamp, COLLAPSE_OPTIONS
+from wayback_google_analytics.utils import get_limit_from_frequency, validate_dates, get_14_digit_timestamp, get_date_from_timestamp, COLLAPSE_OPTIONS
 
 class UtilsTestCase(TestCase):
     """Tests for utils.py"""

@@ -1,3 +1,5 @@
 venv
 .env
-./output
+output
+dist
+**/__pycache__

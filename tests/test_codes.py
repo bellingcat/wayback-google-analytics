@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from osint_ga.codes import get_UA_code, get_GA_code, get_GTM_code
+from wayback_google_analytics.codes import get_UA_code, get_GA_code, get_GTM_code
 
 
 class CodesTestCase(TestCase):

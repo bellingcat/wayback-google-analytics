@@ -73,26 +73,29 @@ Options list (run `python main.py -h` to see in terminal):
 ```terminal
 options:
   -h, --help            show this help message and exit
-  --input_file INPUT_FILE
+  -i INPUT_FILE, --input_file INPUT_FILE
                         Enter a file path to a list of urls in a readable file
                         type (e.g. .txt, .csv, .md)
-  --urls URLS [URLS ...]
+  -u URLS [URLS ...], --urls URLS [URLS ...]
                         Enter a list of urls separated by spaces to get their
                         UA/GA codes (e.g. --urls https://www.google.com
                         https://www.facebook.com)
-  --output {csv,txt,json,xlsx}
+  -o {csv,txt,json,xlsx}, --output {csv,txt,json,xlsx}
                         Enter an output type to write results to file.
                         Defaults to json.
-  --start_date START_DATE
+  -s START_DATE, --start_date START_DATE
                         Start date for time range (dd/mm/YYYY:HH:MM) Defaults
                         to 01/10/2012:00:00, when UA codes were adopted.
-  --end_date END_DATE   End date for time range (dd/mm/YYYY:HH:MM). Defaults
+  -e END_DATE, --end_date END_DATE
+                        End date for time range (dd/mm/YYYY:HH:MM). Defaults
                         to None.
-  --frequency {yearly,monthly,daily,hourly}
+  -f {yearly,monthly,daily,hourly}, --frequency {yearly,monthly,daily,hourly}
                         Can limit snapshots to remove duplicates (1 per hr,
                         day, month, etc). Defaults to None.
-  --limit LIMIT         Limits number of snapshots returned. Defaults to -100
+  -l LIMIT, --limit LIMIT
+                        Limits number of snapshots returned. Defaults to -100
                         (most recent 100 snapshots).
+
 ```
 
 Examples:
@@ -108,9 +111,9 @@ To check a single website for its current codes plus codes from the last 2,000 a
 
 # Contact
 
-<a href="https://github.com/jclark1913">Github</a>
-<a href="https://twitter.com/JustinClarkJO">Twitter</a>
-<a href="https://www.linkedin.com/in/justin-w-clark/">Linkedin</a>
+-- <a href="https://github.com/jclark1913">Github</a>
+-- <a href="https://twitter.com/JustinClarkJO">Twitter</a>
+-- <a href="https://www.linkedin.com/in/justin-w-clark/">Linkedin</a>
 
 Or email me at jclarksummit@gmail.com
 

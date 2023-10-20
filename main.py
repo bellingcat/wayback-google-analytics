@@ -147,7 +147,9 @@ def setup_args():
 
     return parser.parse_args()
 
-
-if __name__ == "__main__":
+def main_entrypoint():
     args = setup_args()
     asyncio.run(main(args))
+
+if __name__ == "__main__":
+    main_entrypoint()

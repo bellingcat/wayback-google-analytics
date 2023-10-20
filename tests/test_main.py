@@ -1,4 +1,4 @@
-from main import main, setup_args
+from wayback_google_analytics.main import main, setup_args
 import unittest
 import sys
 from io import StringIO

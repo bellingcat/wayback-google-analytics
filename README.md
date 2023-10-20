@@ -57,7 +57,7 @@ pip install -r requirements.txt
 3. Get a high-level overview:
 
 ```terminal
-python main.py -help
+python wayback_google_analyitcs/main.py -help
 ```
 
 # Usage
@@ -68,7 +68,7 @@ python main.py -help
 
 3. Add any of the following options:
 
-Options list (run `python main.py -h` to see in terminal):
+Options list (run `python wayback_google_analyitcs/main.py -h` to see in terminal):
 
 ```terminal
 options:
@@ -101,13 +101,13 @@ options:
 Examples:
 
 To get current codes for two websites and archived codes between Oct 1, 2012 and Oct 25, 2012:
-`python main.py --urls https://someurl.com https://otherurl.org --output json --start_date 01/10/2012 --end_date 25/10/2012 --frequency hourly`
+`python wayback_google_analyitcs/main.py --urls https://someurl.com https://otherurl.org --output json --start_date 01/10/2012 --end_date 25/10/2012 --frequency hourly`
 
 To get current codes for a list of websites (from a file) from January 1, 2012 to the present day, checking for snapshots monthly and returning it as an excel spreadsheet:
-`python main.py --input_file path/to/file.txt --output xlsx --start_date 01/01/2012`
+`python wayback_google_analyitcs/main.py --input_file path/to/file.txt --output xlsx --start_date 01/01/2012`
 
 To check a single website for its current codes plus codes from the last 2,000 archive.org snapshots:
-`python main.py --urls https://someurl.com --limit -2000`
+`python wayback_google_analyitcs/main.py --urls https://someurl.com --limit -2000`
 
 # Contact
 

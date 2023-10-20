@@ -59,10 +59,10 @@ class AsyncUtilsTestCase(asynctest.TestCase):
         mock_get.assert_called_with(expected_CDX_url, headers=DEFAULT_HEADERS)
 
     @patch("aiohttp.ClientSession.get")
-    @patch("osint_ga.async_utils.get_UA_code")
-    @patch("osint_ga.async_utils.get_GA_code")
-    @patch("osint_ga.async_utils.get_GTM_code")
-    @patch("osint_ga.async_utils.sem", new_callable=MagicMock())
+    @patch("wayback_google_analytics.async_utils.get_UA_code")
+    @patch("wayback_google_analytics.async_utils.get_GA_code")
+    @patch("wayback_google_analytics.async_utils.get_GTM_code")
+    @patch("wayback_google_analytics.async_utils.sem", new_callable=MagicMock())
     async def test_get_codes_from_single_timestamp(
         self, mock_sem, mock_GTM, mock_GA, mock_UA, mock_get
     ):
@@ -119,7 +119,7 @@ class AsyncUtilsTestCase(asynctest.TestCase):
 
         """Does it call get_codes_from_single_timestamp for each timestamp?"""
         with asynctest.mock.patch(
-            "osint_ga.async_utils.get_codes_from_single_timestamp",
+            "wayback_google_analytics.async_utils.get_codes_from_single_timestamp",
             mock_get_codes_from_single_timestamp,
         ):
             session = asynctest.Mock()
@@ -146,7 +146,7 @@ class AsyncUtilsTestCase(asynctest.TestCase):
         mock_get_codes_from_single_timestamp = asynctest.CoroutineMock()
 
         with asynctest.mock.patch(
-            "osint_ga.async_utils.get_codes_from_single_timestamp",
+            "wayback_google_analytics.async_utils.get_codes_from_single_timestamp",
             mock_get_codes_from_single_timestamp,
         ):
             session = asynctest.Mock()
@@ -162,7 +162,7 @@ class AsyncUtilsTestCase(asynctest.TestCase):
         mock_get_codes_from_single_timestamp = asynctest.CoroutineMock()
 
         with asynctest.mock.patch(
-            "osint_ga.async_utils.get_codes_from_single_timestamp",
+            "wayback_google_analytics.async_utils.get_codes_from_single_timestamp",
             mock_get_codes_from_single_timestamp,
         ):
             session = asynctest.Mock()

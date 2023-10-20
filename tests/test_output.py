@@ -72,7 +72,7 @@ class OutputTestCase(TestCase):
         self.assertEqual(format_archived_codes(archived_codes), expected)
         self.assertTrue(type(format_archived_codes(archived_codes)) is str)
 
-    @patch("osint_ga.output.datetime", autospec=True)
+    @patch("wayback_google_analytics.output.datetime", autospec=True)
     def test_init_output_valid_types(self, mock_datetime):
         """Does init_output create a dict with correct keys?"""
         mock_now = Mock(
@@ -153,8 +153,8 @@ class OutputTestCase(TestCase):
         os.remove(test_file)
         self.assertEqual(test_data, test_results)
 
-    @patch("osint_ga.output.get_urls_df", autospec=True)
-    @patch("osint_ga.output.get_codes_df", autospec=True)
+    @patch("wayback_google_analytics.output.get_urls_df", autospec=True)
+    @patch("wayback_google_analytics.output.get_codes_df", autospec=True)
     def test_write_output_csv(self, mock_urls, mock_codes):
         """Does write_output write results to correct csv files?"""
 
@@ -182,8 +182,8 @@ class OutputTestCase(TestCase):
         self.assertEqual(test_data_urls, test_results)
         self.assertEqual(test_data_codes, test_results)
 
-    @patch("osint_ga.output.get_urls_df", autospec=True)
-    @patch("osint_ga.output.get_codes_df", autospec=True)
+    @patch("wayback_google_analytics.output.get_urls_df", autospec=True)
+    @patch("wayback_google_analytics.output.get_codes_df", autospec=True)
     def test_write_output_xlsx(self, mock_urls, mock_codes):
         """Does write_output write results to correct xlsx file?"""
 

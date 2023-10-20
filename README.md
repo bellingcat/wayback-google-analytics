@@ -122,3 +122,9 @@ Or email me at jclarksummit@gmail.com
 - For more info about analytics codes and what the GA-4 rollout means for OSINT: [https://digitalinvestigations.substack.com/p/what-the-rollout-of-google-analytics]
 
 - For an example investigation usings analytics codes: [https://www.bellingcat.com/resources/how-tos/2015/07/23/unveiling-hidden-connections-with-google-analytics-ids/]
+
+# Publishing
+To publish a new version to pypi
+1. change the version in [pyproject.toml](pyproject.toml)
+2. create a new tag for that version `git tag "vX.0.0"`
+3. push the tag `git push --tags`

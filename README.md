@@ -73,7 +73,18 @@
         <li><a href="#example-spreadsheet">Example spreadsheet</a></li>
       </ul>
     </li>
-    <li><a href="#contributing">Contributing</a></li>
+    <li>
+      <a href="#contributing">Contributing</a>
+      <ul>
+        <li><a href="#bugs-and-feature-requests">Bugs and feature requests</a>
+      </ul>
+    </li>
+    <li>
+      <a href="#development">Development</a>
+      <ul>
+        <li><a href="#placeholder">Poetry</li>
+      </ul>
+    </li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
@@ -276,6 +287,18 @@ Ordered by code:
 Please feel free to [open an issue](https://github.com/bellingcat/wayback-google-analytics/issues) should you encounter any bugs or have suggestions for new features or improvements. You can also [reach out to me](#contact) directly with suggestions or thoughts.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- DEVELOPMENT -->
+## Development
+
+### Testing
+
+* Run tests with `python -m unittest discover`
+* Check coverage with `coverage run -m unittest`
+
+### Using Poetry for Development
+
+Wayback Google Analytics uses [Poetry](https://python-poetry.org/), a Python dependency management and packaging tool. A github workflow automates the publishing process on pushes to main ((see our workflow here)[https://github.com/bellingcat/wayback-google-analytics/actions]), but be sure to update the version number in `pyproject.toml` when updating.
 
 <!-- LICENSE -->
 ## License

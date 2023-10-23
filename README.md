@@ -29,7 +29,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-    <img src="docs/imgs/jsonoutput1.png" width="500">
+    <img src="./docs/imgs/jsonoutput1.png" width="500">
 
 <h3 align="center">Wayback Google Analytics</h3>
 
@@ -256,12 +256,12 @@ The result is a single `.xlsx` file with two sheets.
 
 Ordered by website:
 <div align="center">
-  <img src="docs/imgs/xlsxbysite.png" width=1000>
+  <img src="./docs/imgs/xlsxbysite.png" width=1000>
 </div>
 
 Ordered by code:
 <div align="center">
-  <img src="docs/imgs/xlsxbycode.png">
+  <img src="./docs/imgs/xlsxbycode.png">
 </div>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

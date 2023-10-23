@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.scripts]
-wayback-google-analytics = "main:main_entrypoint"
+wayback-google-analytics = "wayback_google_analytics.main:main_entrypoint"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"

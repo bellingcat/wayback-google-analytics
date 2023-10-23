@@ -218,6 +218,7 @@ You can also clone and download the repo from github and use the tool locally.
 
 3. Add any of the following options:
 
+
 Options list (run `wayback-google-analytics -h` to see in terminal):
 
 ```terminal
@@ -258,6 +259,7 @@ To get current codes for a list of websites (from a file) from January 1, 2012 t
 
 To check a single website for its current codes plus codes from the last 2,000 archive.org snapshots:
 `wayback-google-analytics --urls https://someurl.com --limit -2000`
+
 
 ## Output files & spreadsheets
 

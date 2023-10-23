@@ -55,6 +55,7 @@
       <ul>
         <li><a href="#why-do-i-need-ga-codes">Why do I need GA codes?</a></li>
         <li><a href="#how-does-this-tool-help-me">How does this tool help me?</a></li>
+        <li><a href="#further-reading">Further reading</a></li>
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
@@ -135,6 +136,12 @@ The raw json output for each provided url looks something like this:
         },
     }
 ```
+
+### Further reading
+
+- For more info about analytics codes and what the GA-4 rollout means for OSINT: [https://digitalinvestigations.substack.com/p/what-the-rollout-of-google-analytics]
+
+- For an example investigation usings analytics codes: [https://www.bellingcat.com/resources/how-tos/2015/07/23/unveiling-hidden-connections-with-google-analytics-ids/]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -300,6 +307,12 @@ Please feel free to [open an issue](https://github.com/bellingcat/wayback-google
 ### Using Poetry for Development
 
 Wayback Google Analytics uses [Poetry](https://python-poetry.org/), a Python dependency management and packaging tool. A github workflow automates the publishing process on pushes to main ((see our workflow here)[https://github.com/bellingcat/wayback-google-analytics/actions]), but be sure to update the version number in `pyproject.toml` when updating.
+
+To publish a new version to PyPI, you can follow these steps:
+
+1. Change the version number in [pyproject.toml](pyproject.toml)
+2. Create a new tag for that version `git tag "vX.0.0"`
+3. Push the tag `git push --tags`
 
 <!-- LICENSE -->
 ## License

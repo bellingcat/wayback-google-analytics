@@ -82,7 +82,8 @@
     <li>
       <a href="#development">Development</a>
       <ul>
-        <li><a href="#placeholder">Poetry</li>
+        <li><a href="#testing">Testing</li>
+        <li><a href="#using-poetry-for-development">Using Poetry for development</li>
       </ul>
     </li>
     <li><a href="#license">License</a></li>

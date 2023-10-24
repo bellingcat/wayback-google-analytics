@@ -141,7 +141,7 @@ The raw json output for each provided url looks something like this:
 
 - For more info about analytics codes and what the GA-4 rollout means for OSINT: [https://digitalinvestigations.substack.com/p/what-the-rollout-of-google-analytics]
 
-- For an example investigation usings analytics codes: [https://www.bellingcat.com/resources/how-tos/2015/07/23/unveiling-hidden-connections-with-google-analytics-ids/]
+- For an example investigation usings analytics codes: https://www.bellingcat.com/resources/how-tos/2015/07/23/unveiling-hidden-connections-with-google-analytics-ids/
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

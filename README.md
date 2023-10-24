@@ -107,7 +107,7 @@ Google Analytics codes are a useful data point when examining relationships betw
 
 ### How does this tool help me?
 
-Luckily, the Internet Archive's Wayback Machine contains useful snapshots of websites containing their historic GA IDs. While you could feasibly check each snapshot manually, this tool automates that process with the Wayback Machines CDX API to simplify and speed up the process. Enter a list of urls and a time frame (along with extra, optional parameters) to collect current and historic GA, UA and GTM codes and return them in a format you choose (json, txt, xlsx or csv).
+Luckily, the Internet Archive's [Wayback Machine](https://archive.org/web/) contains useful snapshots of websites containing their historic GA IDs. While you could feasibly check each snapshot manually, this tool automates that process with the Wayback Machines CDX API to simplify and speed up the process. Enter a list of urls and a time frame (along with extra, optional parameters) to collect current and historic GA, UA and GTM codes and return them in a format you choose (json, txt, xlsx or csv).
 
 The raw json output for each provided url looks something like this:
 

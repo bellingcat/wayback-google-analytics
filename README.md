@@ -332,7 +332,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 You can contact me through email or social media.
 
-* email: jclarksummit@gmail.com
+* email: jclarksummit at gmail dot com
 * Twitter/X: [@JustinClarkJO](https://twitter.com/JustinClarkJO)
 * Linkedin: [Justin Clark](https://linkedin.com/in/justin-w-clark)
 

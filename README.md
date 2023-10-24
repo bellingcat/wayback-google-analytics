@@ -312,7 +312,7 @@ Please feel free to [open an issue](https://github.com/bellingcat/wayback-google
 
 Wayback Google Analytics uses [Poetry](https://python-poetry.org/), a Python dependency management and packaging tool. A GitHub workflow automates the tests on PRs and to main ([see our workflow here](https://github.com/bellingcat/wayback-google-analytics/actions)),  be sure to update the [semantic](https://semver.org/) version number in `pyproject.toml` when opening a PR. 
 
-To publish a new version to PyPI, you can follow these steps:
+If you have push access, follow these steps to trigger the GitHub workflow that will build and release a new version to PyPI :
 
 1. Change the version number in [pyproject.toml](pyproject.toml)
 2. Create a new tag for that version `git tag "vX.0.0"`

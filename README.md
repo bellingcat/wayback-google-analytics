@@ -310,7 +310,7 @@ Please feel free to [open an issue](https://github.com/bellingcat/wayback-google
 
 ### Using Poetry for Development
 
-Wayback Google Analytics uses [Poetry](https://python-poetry.org/), a Python dependency management and packaging tool. A github workflow automates the publishing process on pushes to main ((see our workflow here)[https://github.com/bellingcat/wayback-google-analytics/actions]), but be sure to update the version number in `pyproject.toml` when updating.
+Wayback Google Analytics uses [Poetry](https://python-poetry.org/), a Python dependency management and packaging tool. A GitHub workflow automates the tests on PRs and to main ([see our workflow here](https://github.com/bellingcat/wayback-google-analytics/actions)),  be sure to update the [semantic](https://semver.org/) version number in `pyproject.toml` when opening a PR. 
 
 To publish a new version to PyPI, you can follow these steps:
 

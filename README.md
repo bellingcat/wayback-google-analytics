@@ -362,6 +362,8 @@ Project Link: [https://github.com/bellingcat/wayback-google-analytics](https://g
 [stars-url]: https://github.com/bellingcat/wayback-google-analytics/stargazers
 [issues-shield]: https://img.shields.io/github/issues/bellingcat/wayback-google-analytics.svg?style=for-the-badge
 [issues-url]: https://github.com/bellingcat/wayback-google-analytics/issues
+[pypi-shield]: https://img.shields.io/pypi/v/wayback-google-analytics
+[pypi-url]: https://pypi.org/project/wayback-google-analytics/
 [license-shield]: https://img.shields.io/github/license/bellingcat/wayback-google-analytics.svg?style=for-the-badge
 [license-url]: https://github.com/bellingcat/wayback-google-analytics/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555

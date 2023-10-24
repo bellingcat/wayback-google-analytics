@@ -98,17 +98,17 @@ def get_urls_df(results):
             url_list.append(
                 {
                     "url": url,
-                    "UA_Code": info["current_UA_code"],
-                    "GA_Code": info["current_GA_code"],
-                    "GTM_Code": info["current_GTM_code"],
+                    "UA_Code": info.get("current_UA_code", ""),
+                    "GA_Code": info.get("current_GA_code", ""),
+                    "GTM_Code": info.get("current_GTM_code", ""),
                     "Archived_UA_Codes": format_archived_codes(
-                        info["archived_UA_codes"]
+                        info.get("archived_UA_codes", {})
                     ),
                     "Archived_GA_Codes": format_archived_codes(
-                        info["archived_GA_codes"]
+                        info.get("archived_GA_codes", {})
                     ),
                     "Archived_GTM_Codes": format_archived_codes(
-                        info["archived_GTM_codes"]
+                        info.get("archived_GTM_codes", {})
                     ),
                 }
             )

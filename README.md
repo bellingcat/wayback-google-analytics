@@ -1,13 +1,115 @@
-# Overview
+<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+<a name="readme-top"></a>
+<!--
+*** Thanks for checking out the Best-README-Template. If you have a suggestion
+*** that would make this better, please fork the repo and create a pull request
+*** or simply open an issue with the tag "enhancement".
+*** Don't forget to give the project a star!
+*** Thanks again! Now go create something AMAZING! :D
+-->
 
-OSINT Google Analytics is a lightweight tool that gathers current and historic
-Google analytics data (UA, GA and GTM codes) from a collection of website urls. UA codes are a particularly
-useful data point for OSINT investigators, but they're being phased out in Google's GA4.
 
-Luckily, the Internet Archive's Wayback Machine allows us to look back and find older codes. This tool finds
-Wayback snapshots using the CDX API and then returns a dictionary of current and previous codes. The results can be returned as text in a json or txt file, or returned as a csv or xlsx database for archival purposes.
 
-The raw output looks something like this:
+<!-- PROJECT SHIELDS -->
+<!--
+*** I'm using markdown "reference style" links for readability.
+*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
+*** See the bottom of this document for the declaration of the reference variables
+*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
+*** https://www.markdownguide.org/basic-syntax/#reference-style-links
+-->
+
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+[![LinkedIn][linkedin-shield]][linkedin-url]
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+    <img src="./docs/imgs/jsonoutput1.png" width="500">
+
+<h3 align="center">Wayback Google Analytics</h3>
+
+  <p align="center">
+    A lightweight tool to gather current and historic Google analytics codes for OSINT investigations.
+    <br />
+    <br />
+    ·
+    <a href="https://github.com/bellingcat/wayback-google-analytics/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/bellingcat/wayback-google-analytics/issues">Request Feature</a>
+  </p>
+</div>
+
+
+
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#why-do-i-need-ga-codes">Why do I need GA codes?</a></li>
+        <li><a href="#how-does-this-tool-help-me">How does this tool help me?</a></li>
+        <li><a href="#further-reading">Further reading</a></li>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#installation">Installation</a>
+      <ul>
+        <li><a href="#install-with-pip">Install with pip</a></li>
+        <li><a href="#download-from-source">Download from source</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#usage">Usage</a>
+      <ul>
+        <li><a href="#getting-started">Getting started</a></li>
+        <li><a href="#output-files--spreadsheets">Output files and spreadsheets</a></li>
+        <li><a href="#example-spreadsheet">Example spreadsheet</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#contributing">Contributing</a>
+      <ul>
+        <li><a href="#bugs-and-feature-requests">Bugs and feature requests</a>
+      </ul>
+    </li>
+    <li>
+      <a href="#development">Development</a>
+      <ul>
+        <li><a href="#testing">Testing</li>
+        <li><a href="#using-poetry-for-development">Using Poetry for development</li>
+      </ul>
+    </li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
+
+
+
+<!-- ABOUT THE PROJECT -->
+## About The Project
+
+Wayback Google Analytics is a lightweight tool that gathers current and historic
+Google analytics data (UA, GA and GTM codes) from a collection of website urls.
+
+### Why do I need GA codes?
+
+Google Analytics codes are a useful data point when examining relationships between websites. If two seemingly disparate websites share the same UA, GA or GTM code then there is a good chance that they are managed by the same individual or group. This useful breadcrumb has been used by researchers and journalists in OSINT investigations regularly over the last decade, but a recent change in how Google handles its analytics codes threatens to limit its effectiveness. Google began phasing out UA codes as part of its Google Analytics 4 upgrade in July 2023, making it significantly more challenging to use this breadcrumb during investigations.
+
+### How does this tool help me?
+
+Luckily, the Internet Archive's [Wayback Machine](https://archive.org/web/) contains useful snapshots of websites containing their historic GA IDs. While you could feasibly check each snapshot manually, this tool automates that process with the Wayback Machines CDX API to simplify and speed up the process. Enter a list of urls and a time frame (along with extra, optional parameters) to collect current and historic GA, UA and GTM codes and return them in a format you choose (json, txt, xlsx or csv).
+
+The raw json output for each provided url looks something like this:
 
 ```json
         "someurl.com": {
@@ -35,40 +137,91 @@ The raw output looks something like this:
     }
 ```
 
-# Installation
+### Further reading
 
-#### Install from source
+- For more info about analytics codes and what the GA-4 rollout means for OSINT: https://digitalinvestigations.substack.com/p/what-the-rollout-of-google-analytics
+
+- For an example investigation usings analytics codes: https://www.bellingcat.com/resources/how-tos/2015/07/23/unveiling-hidden-connections-with-google-analytics-ids/
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+### Built With
+
+<div align="center">
+
+![Python][Python]
+![Pandas][Pandas]
+
+</div>
+
+Additional libraries/tools: [BeautifulSoup4](https://pypi.org/project/beautifulsoup4/), [Asyncio](https://docs.python.org/3/library/asyncio.html), [Aiohttp](https://docs.aiohttp.org/en/stable/)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- GETTING STARTED -->
+## Installation
+
+### Install from [pypi](https://pypi.org/project/wayback-google-analytics/) (with pip)
+
+[![PyPI][pypi-shield]][pypi-url]
+
+The easiest way to to install Wayback Google Analytics is from the command line with pip.
+
+1. Open a terminal window and navigate to your chosen directory.
+2. Create a virtual environment and activate it (optional, but recommended; if you use [Poetry](https://python-poetry.org/) or [pipenv](https://pipenv.pypa.io/en/latest/) those package managers do it for you)
+    ```terminal
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+3. Install the project with pip
+    ```terminal
+    pip install wayback-google-analytics
+    ```
+4. Get a high-level overview
+    ```terminal
+    wayback-google-analytics -h
+    ```
+
+### Download from source
+
+You can also clone and download the repo from github and use the tool locally.
 
 1. Clone repo:
-
-```terminal
-git clone git@github.com:jclark1913/osint-google-analytics.git
-```
+    ```terminal
+    git clone git@github.com:jclark1913/osint-google-analytics.git
+    ```
 
 2. Navigate to root, create a venv and install requirements.txt:
-
-```terminal
-cd osint-google-analytics
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
+    ```terminal
+    cd osint-google-analytics
+    python -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+    ```
 
 3. Get a high-level overview:
+    ```terminal
+    python main.py -h
+    ```
 
-```terminal
-python wayback_google_analyitcs/main.py -help
-```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# Usage
 
-1. Enter a list of urls manually through the command line using `--urls` or from a given file using `--input_file`.
 
-2. Specify your output format (.csv, .txt, .xlsx or .csv) using `--output`.
+<!-- USAGE EXAMPLES -->
+## Usage
+
+### Getting started
+
+1. Enter a list of urls manually through the command line using `--urls` (`-u`) or from a given file using `--input_file` (`-i`).
+
+2. Specify your output format (.csv, .txt, .xlsx or .csv) using `--output` (`-o`).
 
 3. Add any of the following options:
 
-Options list (run `python wayback_google_analyitcs/main.py -h` to see in terminal):
+
+Options list (run `wayback-google-analytics -h` to see in terminal):
 
 ```terminal
 options:
@@ -101,30 +254,119 @@ options:
 Examples:
 
 To get current codes for two websites and archived codes between Oct 1, 2012 and Oct 25, 2012:
-`python wayback_google_analyitcs/main.py --urls https://someurl.com https://otherurl.org --output json --start_date 01/10/2012 --end_date 25/10/2012 --frequency hourly`
+`wayback-google-analytics --urls https://someurl.com https://otherurl.org --output json --start_date 01/10/2012 --end_date 25/10/2012 --frequency hourly`
 
 To get current codes for a list of websites (from a file) from January 1, 2012 to the present day, checking for snapshots monthly and returning it as an excel spreadsheet:
-`python wayback_google_analyitcs/main.py --input_file path/to/file.txt --output xlsx --start_date 01/01/2012`
+`wayback-google-analytics --input_file path/to/file.txt --output xlsx --start_date 01/01/2012`
 
 To check a single website for its current codes plus codes from the last 2,000 archive.org snapshots:
-`python wayback_google_analyitcs/main.py --urls https://someurl.com --limit -2000`
+`wayback-google-analytics --urls https://someurl.com --limit -2000`
 
-# Contact
 
--- <a href="https://github.com/jclark1913">Github</a>
--- <a href="https://twitter.com/JustinClarkJO">Twitter</a>
--- <a href="https://www.linkedin.com/in/justin-w-clark/">Linkedin</a>
+## Output files & spreadsheets
 
-Or email me at jclarksummit@gmail.com
+Wayback Google Analytics allows you to export your findings to either `.csv` or `.xlsx` spreadsheets. When choosing to save your findings as a spreadsheet, the tool generates two databases: one where each url is the primary index and another where each identified code is the primary index. In an `.xlsx` file this is one spreadsheet with two sheets, while the `.csv` option generates one file sorted by codes and another sorted by websites. All output files can be found in `/output`, which is created in the directory from which the code is executed.
 
-# Further Reading
+#### Example spreadsheet
 
-- For more info about analytics codes and what the GA-4 rollout means for OSINT: [https://digitalinvestigations.substack.com/p/what-the-rollout-of-google-analytics]
+Let's say we're looking into data from 4 websites from 2015 until present and we want to save what we find in an excel spreadsheet. Our start command looks something like this:
 
-- For an example investigation usings analytics codes: [https://www.bellingcat.com/resources/how-tos/2015/07/23/unveiling-hidden-connections-with-google-analytics-ids/]
+```terminal
+wayback-google-analytics -u https://yapatriot.ru https://zanogu.com https://whoswho.com.ua https://adamants.ru -s 01/01/2015 -f yearly -o xlsx
+```
 
-# Publishing
-To publish a new version to pypi
-1. change the version in [pyproject.toml](pyproject.toml)
-2. create a new tag for that version `git tag "vX.0.0"`
-3. push the tag `git push --tags`
+The result is a single `.xlsx` file with two sheets.
+
+Ordered by website:
+<div align="center">
+  <img src="./docs/imgs/xlsxbysite.png" width=1000>
+</div>
+
+Ordered by code:
+<div align="center">
+  <img src="./docs/imgs/xlsxbycode.png">
+</div>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTRIBUTING -->
+## Contributing
+
+### Bugs and feature requests
+
+Please feel free to [open an issue](https://github.com/bellingcat/wayback-google-analytics/issues) should you encounter any bugs or have suggestions for new features or improvements. You can also [reach out to me](#contact) directly with suggestions or thoughts.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- DEVELOPMENT -->
+## Development
+
+### Testing
+
+* Run tests with `python -m unittest discover`
+* Check coverage with `coverage run -m unittest`
+
+### Using Poetry for Development
+
+Wayback Google Analytics uses [Poetry](https://python-poetry.org/), a Python dependency management and packaging tool. A GitHub workflow automates the tests on PRs and to main ([see our workflow here](https://github.com/bellingcat/wayback-google-analytics/actions)),  be sure to update the [semantic](https://semver.org/) version number in `pyproject.toml` when opening a PR. 
+
+If you have push access, follow these steps to trigger the GitHub workflow that will build and release a new version to PyPI :
+
+1. Change the version number in [pyproject.toml](pyproject.toml)
+2. Create a new tag for that version `git tag "vX.0.0"`
+3. Push the tag `git push --tags`
+
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE.txt` for more information.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTACT -->
+## Contact
+
+You can contact me through email or social media.
+
+* email: jclarksummit at gmail dot com
+* Twitter/X: [@JustinClarkJO](https://twitter.com/JustinClarkJO)
+* Linkedin: [Justin Clark](https://linkedin.com/in/justin-w-clark)
+
+Project Link: [https://github.com/bellingcat/wayback-google-analytics](https://github.com/bellingcat/wayback-google-analytics)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+* [Bellingcat](https://bellingcat.org) for hosting this project
+* [Miguel Ramalho](https://github.com/msramalho) for constant support, thoughtful code reviews and suggesting the original idea for this project
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/bellingcat/wayback-google-analytics.svg?style=for-the-badge
+[contributors-url]: https://github.com/bellingcat/wayback-google-analytics/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/bellingcat/wayback-google-analytics.svg?style=for-the-badge
+[forks-url]: https://github.com/bellingcat/wayback-google-analytics/network/members
+[stars-shield]: https://img.shields.io/github/stars/bellingcat/wayback-google-analytics.svg?style=for-the-badge
+[stars-url]: https://github.com/bellingcat/wayback-google-analytics/stargazers
+[issues-shield]: https://img.shields.io/github/issues/bellingcat/wayback-google-analytics.svg?style=for-the-badge
+[issues-url]: https://github.com/bellingcat/wayback-google-analytics/issues
+[pypi-shield]: https://img.shields.io/pypi/v/wayback-google-analytics
+[pypi-url]: https://pypi.org/project/wayback-google-analytics/
+[license-shield]: https://img.shields.io/github/license/bellingcat/wayback-google-analytics.svg?style=for-the-badge
+[license-url]: https://github.com/bellingcat/wayback-google-analytics/blob/master/LICENSE.txt
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-url]: https://linkedin.com/in/justin-w-clark
+[Python]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
+[Pandas]: https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white

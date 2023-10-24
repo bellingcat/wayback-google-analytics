@@ -169,7 +169,7 @@ Additional libraries/tools: [BeautifulSoup4](https://pypi.org/project/beautifuls
 The easiest way to to install Wayback Google Analytics is from the command line with pip.
 
 1. Open a terminal window and navigate to your chosen directory.
-2. Create a virtual environment and activate it (optional, but recommended)
+2. Create a virtual environment and activate it (optional, but recommended; if you use [Poetry](https://python-poetry.org/) or [pipenv](https://pipenv.pypa.io/en/latest/) those package managers do it for you)
     ```terminal
     python3 -m venv venv
     source venv/bin/activate

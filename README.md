@@ -162,7 +162,9 @@ Additional libraries/tools: [BeautifulSoup4](https://pypi.org/project/beautifuls
 <!-- GETTING STARTED -->
 ## Installation
 
-### Install with pip
+### Install from [pypi](https://pypi.org/project/wayback-google-analytics/) (with pip)
+
+[![PyPI][pypi-shield]][pypi-url]
 
 The easiest way to to install Wayback Google Analytics is from the command line with pip.
 

@@ -29,7 +29,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-    <img src="./docs/imgs/jsonoutput1.png" width="500">
+    <img src="https://raw.githubusercontent.com/bellingcat/wayback-google-analytics/main/docs/imgs/jsonoutput1.png" width="500">
 
 <h3 align="center">Wayback Google Analytics</h3>
 
@@ -279,12 +279,12 @@ The result is a single `.xlsx` file with two sheets.
 
 Ordered by website:
 <div align="center">
-  <img src="./docs/imgs/xlsxbysite.png" width=1000>
+  <img src="https://github.com/bellingcat/wayback-google-analytics/blob/main/docs/imgs/xlsxbysite.png?raw=true" width=1000>
 </div>
 
 Ordered by code:
 <div align="center">
-  <img src="./docs/imgs/xlsxbycode.png">
+  <img src="https://github.com/bellingcat/wayback-google-analytics/blob/main/docs/imgs/xlsxbycode.png?raw=true">
 </div>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -310,7 +310,7 @@ Please feel free to [open an issue](https://github.com/bellingcat/wayback-google
 
 ### Using Poetry for Development
 
-Wayback Google Analytics uses [Poetry](https://python-poetry.org/), a Python dependency management and packaging tool. A GitHub workflow automates the tests on PRs and to main ([see our workflow here](https://github.com/bellingcat/wayback-google-analytics/actions)),  be sure to update the [semantic](https://semver.org/) version number in `pyproject.toml` when opening a PR. 
+Wayback Google Analytics uses [Poetry](https://python-poetry.org/), a Python dependency management and packaging tool. A GitHub workflow automates the tests on PRs and to main ([see our workflow here](https://github.com/bellingcat/wayback-google-analytics/actions)),  be sure to update the [semantic](https://semver.org/) version number in `pyproject.toml` when opening a PR.
 
 If you have push access, follow these steps to trigger the GitHub workflow that will build and release a new version to PyPI :
 

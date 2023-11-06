@@ -38,7 +38,7 @@ async def get_html(session, url):
         return None
 
 
-async def process_url(session, url, start_date, end_date, frequency, limit):
+async def process_url(session, url, start_date, end_date, frequency, limit, semaphore):
     """Returns a dictionary of current and archived UA/GA codes for a single url.
 
     Args:
@@ -74,42 +74,42 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
         },
 
     """
+    async with semaphore:
+        # Initialize dict for entry
+        curr_entry = {url: {}}
 
-    # Initialize dict for entry
-    curr_entry = {url: {}}
+        # Get html + current codes
+        html = await get_html(session, url)
+        print("Retrieving current codes for: ", url)
+        if html:
+            curr_entry[url]["current_UA_code"] = get_UA_code(html)
+            curr_entry[url]["current_GA_code"] = get_GA_code(html)
+            curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
+            curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
+            print("Finished gathering current codes for: ", url)
 
-    # Get html + current codes
-    html = await get_html(session, url)
-    print("Retrieving current codes for: ", url)
-    if html:
-        curr_entry[url]["current_UA_code"] = get_UA_code(html)
-        curr_entry[url]["current_GA_code"] = get_GA_code(html)
-        curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
-        curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
-        print("Finished gathering current codes for: ", url)
+        # Get snapshots for Wayback Machine
+        print("Retrieving archived codes for: ", url)
+        archived_snapshots = await get_snapshot_timestamps(
+            session=session,
+            url=url,
+            start_date=start_date,
+            end_date=end_date,
+            frequency=frequency,
+            limit=limit,
+        )
 
-    # Get snapshots for Wayback Machine
-    print("Retrieving archived codes for: ", url)
-    archived_snapshots = await get_snapshot_timestamps(
-        session=session,
-        url=url,
-        start_date=start_date,
-        end_date=end_date,
-        frequency=frequency,
-        limit=limit,
-    )
+        # Get historic codes from archived snapshots, appending them to curr_entry
+        archived_codes = await get_codes_from_snapshots(
+            session=session, url=url, timestamps=archived_snapshots
+        )
+        curr_entry[url]["archived_UA_codes"] = archived_codes["UA_codes"]
+        curr_entry[url]["archived_GA_codes"] = archived_codes["GA_codes"]
+        curr_entry[url]["archived_GTM_codes"] = archived_codes["GTM_codes"]
 
-    # Get historic codes from archived snapshots, appending them to curr_entry
-    archived_codes = await get_codes_from_snapshots(
-        session=session, url=url, timestamps=archived_snapshots
-    )
-    curr_entry[url]["archived_UA_codes"] = archived_codes["UA_codes"]
-    curr_entry[url]["archived_GA_codes"] = archived_codes["GA_codes"]
-    curr_entry[url]["archived_GTM_codes"] = archived_codes["GTM_codes"]
+        print("Finished retrieving archived codes for: ", url)
 
-    print("Finished retrieving archived codes for: ", url)
-
-    return curr_entry
+        return curr_entry
 
 
 async def get_analytics_codes(
@@ -163,6 +163,7 @@ async def get_analytics_codes(
     """
 
     # Comprehension to create list of tasks for asyncio.gather()
+    semaphore = asyncio.Semaphore(15)
 
     tasks = [
         process_url(
@@ -172,6 +173,7 @@ async def get_analytics_codes(
             end_date=end_date,
             frequency=frequency,
             limit=limit,
+            semaphore=semaphore,
         )
         for url in urls
     ]

@@ -70,11 +70,13 @@ async def main(args):
 
     # Warn user if large request
     if abs(int(args.limit)) > 500 or len(args.urls) > 9:
-        response = input(f"""Large requests can lead to being rate limited by archive.org.\n\n Current limit: {args.limit} (Recommended < 500) \n\n Current # of urls: {len(args.urls)} (Recommended < 10, unless limit < 50)
+        response = input(
+            f"""Large requests can lead to being rate limited by archive.org.\n\n Current limit: {args.limit} (Recommended < 500) \n\n Current # of urls: {len(args.urls)} (Recommended < 10, unless limit < 50)
 
         Do you wish to proceed? (Yes/no)
-                         """)
-        if response.lower() not in ('yes', 'y'):
+                         """
+        )
+        if response.lower() not in ("yes", "y"):
             print("Request cancelled.")
             exit()
 
@@ -97,7 +99,9 @@ async def main(args):
         if args.output:
             write_output(output_file, args.output, results)
     except aiohttp.ClientError as e:
-        print("Your request was rate limited. Wait 5 minutes and try again and consider reducing the limit and # of numbers.")
+        print(
+            "Your request was rate limited. Wait 5 minutes and try again and consider reducing the limit and # of numbers."
+        )
 
 
 def setup_args():
@@ -166,7 +170,7 @@ def setup_args():
     parser.add_argument(
         "-sc",
         "--skip_current",
-        action='store_true',
+        action="store_true",
         help="Add this flag to skip current UA/GA codes when getting archived codes.",
     )
 

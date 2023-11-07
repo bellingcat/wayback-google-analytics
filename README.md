@@ -202,7 +202,7 @@ You can also clone and download the repo from github and use the tool locally.
 
 3. Get a high-level overview:
     ```terminal
-    python main.py -h
+    python -m wayback_google_analytics.main.py -h
     ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -227,27 +227,28 @@ Options list (run `wayback-google-analytics -h` to see in terminal):
 options:
   -h, --help            show this help message and exit
   -i INPUT_FILE, --input_file INPUT_FILE
-                        Enter a file path to a list of urls in a readable file
-                        type (e.g. .txt, .csv, .md)
+                        Enter a file path to a list of urls in a readable file type
+                        (e.g. .txt, .csv, .md)
   -u URLS [URLS ...], --urls URLS [URLS ...]
-                        Enter a list of urls separated by spaces to get their
-                        UA/GA codes (e.g. --urls https://www.google.com
+                        Enter a list of urls separated by spaces to get their UA/GA
+                        codes (e.g. --urls https://www.google.com
                         https://www.facebook.com)
   -o {csv,txt,json,xlsx}, --output {csv,txt,json,xlsx}
-                        Enter an output type to write results to file.
-                        Defaults to json.
+                        Enter an output type to write results to file. Defaults to
+                        json.
   -s START_DATE, --start_date START_DATE
-                        Start date for time range (dd/mm/YYYY:HH:MM) Defaults
-                        to 01/10/2012:00:00, when UA codes were adopted.
+                        Start date for time range (dd/mm/YYYY:HH:MM) Defaults to
+                        01/10/2012:00:00, when UA codes were adopted.
   -e END_DATE, --end_date END_DATE
-                        End date for time range (dd/mm/YYYY:HH:MM). Defaults
-                        to None.
+                        End date for time range (dd/mm/YYYY:HH:MM). Defaults to None.
   -f {yearly,monthly,daily,hourly}, --frequency {yearly,monthly,daily,hourly}
-                        Can limit snapshots to remove duplicates (1 per hr,
-                        day, month, etc). Defaults to None.
+                        Can limit snapshots to remove duplicates (1 per hr, day, month,
+                        etc). Defaults to None.
   -l LIMIT, --limit LIMIT
-                        Limits number of snapshots returned. Defaults to -100
-                        (most recent 100 snapshots).
+                        Limits number of snapshots returned. Defaults to -100 (most
+                        recent 100 snapshots).
+  -sc, --skip_current   Add this flag to skip current UA/GA codes when getting archived
+                        codes.
 
 ```
 
@@ -289,7 +290,15 @@ Ordered by code:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<!-- Limitations -->
+## Limitations & Rate Limits
 
+We recommend that you limit your list of urls to ~10 and your max snapshot limit to <500 during queries. While Wayback Google Analytics doesn't have any hardcoded limitations in regards to how many urls or snapshots you can request, large queries can cause 443 errors (rate limiting). Being rate limited can result in a temporary 5-10 minute ban from web.archive.org and the CDX api.
+
+The app currently uses `asyncio.Semaphore()` along with delays between requests, but large queries or operations that take a long time can still result in a 443. Use your judgment and break large queries into smaller, more manageable pieces if you find yourself getting rate limited.
+
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -324,8 +333,6 @@ If you have push access, follow these steps to trigger the GitHub workflow that 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 
 <!-- CONTACT -->
 ## Contact

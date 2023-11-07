@@ -15,30 +15,33 @@ from wayback_google_analytics.utils import (
 )
 
 
-async def get_html(session, url):
+async def get_html(session, url, semaphore):
     """Returns html from a single url.
 
     Args:
         session (aiohttp.ClientSession)
         url (str): Url to scrape html from.
+        semaphore: asyncio.semaphore
 
     Returns:
         html (str): html from url.
     """
+    async with semaphore:
+        try:
+            async with session.get(url, headers=DEFAULT_HEADERS) as response:
+                return await response.text()
+        except aiohttp.ServerTimeoutError as e:
+            print(f"Request to {url} timed out", e)
+        except aiohttp.ClientError as e:
+            print(f"Failed to reach {url}", e)
+        except Exception as e:
+            print(f"Error getting data from {url}", e)
+            return None
 
-    try:
-        async with session.get(url, headers=DEFAULT_HEADERS) as response:
-            return await response.text()
-    except aiohttp.ServerTimeoutError as e:
-        print(f"Request to {url} timed out", e)
-    except aiohttp.ClientError as e:
-        print(f"Failed to reach {url}", e)
-    except Exception as e:
-        print(f"Error getting data from {url}", e)
-        return None
 
-
-async def process_url(session, url, start_date, end_date, frequency, limit):
+async def process_url(
+    session, url, start_date, end_date, frequency, limit, semaphore, skip_current
+):
     """Returns a dictionary of current and archived UA/GA codes for a single url.
 
     Args:
@@ -48,6 +51,8 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
         end_date (str): End date for time range
         frequency (int):
         limit (int):
+        semaphore: asyncio.semaphore
+        skip_current (bool): Determine whether to skip getting current codes
 
     Returns:
         "someurl.com": {
@@ -74,42 +79,44 @@ async def process_url(session, url, start_date, end_date, frequency, limit):
         },
 
     """
+    async with semaphore:
+        # Initialize dict for entry
+        curr_entry = {url: {}}
 
-    # Initialize dict for entry
-    curr_entry = {url: {}}
+        # Get html + current codes
+        if not skip_current:
+            html = await get_html(session, url, semaphore)
+            print("Retrieving current codes for: ", url)
+            if html:
+                curr_entry[url]["current_UA_code"] = get_UA_code(html)
+                curr_entry[url]["current_GA_code"] = get_GA_code(html)
+                curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
+                curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
+                print("Finished gathering current codes for: ", url)
 
-    # Get html + current codes
-    html = await get_html(session, url)
-    print("Retrieving current codes for: ", url)
-    if html:
-        curr_entry[url]["current_UA_code"] = get_UA_code(html)
-        curr_entry[url]["current_GA_code"] = get_GA_code(html)
-        curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
-        curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
-        print("Finished gathering current codes for: ", url)
+        # Get snapshots for Wayback Machine
+        print("Retrieving archived codes for: ", url)
+        archived_snapshots = await get_snapshot_timestamps(
+            session=session,
+            url=url,
+            start_date=start_date,
+            end_date=end_date,
+            frequency=frequency,
+            limit=limit,
+            semaphore=semaphore,
+        )
 
-    # Get snapshots for Wayback Machine
-    print("Retrieving archived codes for: ", url)
-    archived_snapshots = await get_snapshot_timestamps(
-        session=session,
-        url=url,
-        start_date=start_date,
-        end_date=end_date,
-        frequency=frequency,
-        limit=limit,
-    )
+        # Get historic codes from archived snapshots, appending them to curr_entry
+        archived_codes = await get_codes_from_snapshots(
+            session=session, url=url, timestamps=archived_snapshots, semaphore=semaphore
+        )
+        curr_entry[url]["archived_UA_codes"] = archived_codes["UA_codes"]
+        curr_entry[url]["archived_GA_codes"] = archived_codes["GA_codes"]
+        curr_entry[url]["archived_GTM_codes"] = archived_codes["GTM_codes"]
 
-    # Get historic codes from archived snapshots, appending them to curr_entry
-    archived_codes = await get_codes_from_snapshots(
-        session=session, url=url, timestamps=archived_snapshots
-    )
-    curr_entry[url]["archived_UA_codes"] = archived_codes["UA_codes"]
-    curr_entry[url]["archived_GA_codes"] = archived_codes["GA_codes"]
-    curr_entry[url]["archived_GTM_codes"] = archived_codes["GTM_codes"]
+        print("Finished retrieving archived codes for: ", url)
 
-    print("Finished retrieving archived codes for: ", url)
-
-    return curr_entry
+        return curr_entry
 
 
 async def get_analytics_codes(
@@ -119,6 +126,8 @@ async def get_analytics_codes(
     end_date=None,
     frequency=None,
     limit=None,
+    semaphore=None,
+    skip_current=False,
 ):
     """Takes array of urls and returns array of dictionaries with all found analytics codes for a given time range.
 
@@ -162,19 +171,22 @@ async def get_analytics_codes(
         }
     """
 
-    # Comprehension to create list of tasks for asyncio.gather()
-
-    tasks = [
-        process_url(
-            session=session,
-            url=url,
-            start_date=start_date,
-            end_date=end_date,
-            frequency=frequency,
-            limit=limit,
+    tasks = []
+    for url in urls:
+        task = asyncio.create_task(
+            process_url(
+                session=session,
+                url=url,
+                start_date=start_date,
+                end_date=end_date,
+                frequency=frequency,
+                limit=limit,
+                semaphore=semaphore,
+                skip_current=skip_current,
+            )
         )
-        for url in urls
-    ]
+        tasks.append(task)
+        await asyncio.sleep(5)
 
     # Process urls concurrently and return results
     results = await asyncio.gather(*tasks)

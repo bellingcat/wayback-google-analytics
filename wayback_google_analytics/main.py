@@ -66,20 +66,42 @@ async def main(args):
         )
         args.frequency = COLLAPSE_OPTIONS[args.frequency]
 
-    async with aiohttp.ClientSession() as session:
-        results = await get_analytics_codes(
-            session=session,
-            urls=args.urls,
-            start_date=args.start_date,
-            end_date=args.end_date,
-            frequency=args.frequency,
-            limit=args.limit,
-        )
-        print(results)
+    semaphore = asyncio.Semaphore(10)
 
-    # handle printing the output
-    if args.output:
-        write_output(output_file, args.output, results)
+    # Warn user if large request
+    if abs(int(args.limit)) > 500 or len(args.urls) > 9:
+        response = input(
+            f"""Large requests can lead to being rate limited by archive.org.\n\n Current limit: {args.limit} (Recommended < 500) \n\n Current # of urls: {len(args.urls)} (Recommended < 10, unless limit < 50)
+
+        Do you wish to proceed? (Yes/no)
+                         """
+        )
+        if response.lower() not in ("yes", "y"):
+            print("Request cancelled.")
+            exit()
+
+    try:
+        async with semaphore:
+            async with aiohttp.ClientSession() as session:
+                results = await get_analytics_codes(
+                    session=session,
+                    urls=args.urls,
+                    start_date=args.start_date,
+                    end_date=args.end_date,
+                    frequency=args.frequency,
+                    limit=args.limit,
+                    semaphore=semaphore,
+                    skip_current=args.skip_current,
+                )
+                print(results)
+
+        # handle printing the output
+        if args.output:
+            write_output(output_file, args.output, results)
+    except aiohttp.ClientError as e:
+        print(
+            "Your request was rate limited. Wait 5 minutes and try again and consider reducing the limit and # of numbers."
+        )
 
 
 def setup_args():
@@ -91,6 +113,7 @@ def setup_args():
         --end_date: End date for time range. Defaults to None.
         --frequency: Can limit snapshots to remove duplicates (1 per hr, day, month, etc). Defaults to None.
         --limit: Limit number of snapshots returned. Defaults to None.
+        --skip_current: Add this flag to skip current UA/GA codes when getting archived codes.
 
     Returns:
         Command line arguments (argparse)
@@ -144,12 +167,20 @@ def setup_args():
         default=-100,
         help="Limits number of snapshots returned. Defaults to -100 (most recent 100 snapshots).",
     )
+    parser.add_argument(
+        "-sc",
+        "--skip_current",
+        action="store_true",
+        help="Add this flag to skip current UA/GA codes when getting archived codes.",
+    )
 
     return parser.parse_args()
+
 
 def main_entrypoint():
     args = setup_args()
     asyncio.run(main(args))
+
 
 if __name__ == "__main__":
     main_entrypoint()

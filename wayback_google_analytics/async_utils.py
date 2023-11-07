@@ -3,9 +3,6 @@ import re
 from wayback_google_analytics.codes import get_UA_code, get_GA_code, get_GTM_code
 from wayback_google_analytics.utils import get_date_from_timestamp, DEFAULT_HEADERS
 
-# Semaphore to limit number of concurrent requests (10-15 appears to work fine. 20+ causes 443 error from web.archive.org)
-sem = asyncio.Semaphore(10)
-
 
 async def get_snapshot_timestamps(
     session,
@@ -14,6 +11,7 @@ async def get_snapshot_timestamps(
     end_date,
     frequency,
     limit,
+    semaphore=asyncio.Semaphore(10),
 ):
     """Takes a url and returns an array of snapshot timestamps for a given time range.
 
@@ -24,6 +22,7 @@ async def get_snapshot_timestamps(
         end_date (str, optional): End date for time range.
         frequency (str, optional): Can limit snapshots to remove duplicates (1 per hr, day, week, etc).
         limit (int, optional): Limit number of snapshots returned.
+        semaphore: asyncio.Semaphore()
 
     Returns:
         Array of timestamps:
@@ -52,8 +51,9 @@ async def get_snapshot_timestamps(
     pattern = re.compile(r"\d{14}")
 
     # Use session to get timestamps
-    async with session.get(cdx_url, headers=DEFAULT_HEADERS) as response:
-        timestamps = pattern.findall(await response.text())
+    async with semaphore:
+        async with session.get(cdx_url, headers=DEFAULT_HEADERS) as response:
+            timestamps = pattern.findall(await response.text())
 
     print("Timestamps from CDX api: ", timestamps)
 
@@ -61,13 +61,14 @@ async def get_snapshot_timestamps(
     return sorted(timestamps)
 
 
-async def get_codes_from_snapshots(session, url, timestamps):
+async def get_codes_from_snapshots(session, url, timestamps, semaphore=asyncio.Semaphore(10)):
     """Returns an array of UA/GA codes for a given url using the Archive.org Wayback Machine.
 
     Args:
         session (aiohttp.ClientSession)
         url (str)
         timestamps (list): List of timestamps to get codes from.
+        semaphore: asyncio.Semaphore()
 
     Returns:
         {
@@ -103,7 +104,7 @@ async def get_codes_from_snapshots(session, url, timestamps):
 
     # Get codes from each timestamp with asyncio.gather().
     tasks = [
-        get_codes_from_single_timestamp(session, base_url, timestamp, results)
+        get_codes_from_single_timestamp(session, base_url, timestamp, results, semaphore)
         for timestamp in timestamps
     ]
     await asyncio.gather(*tasks)
@@ -120,7 +121,7 @@ async def get_codes_from_snapshots(session, url, timestamps):
     return results
 
 
-async def get_codes_from_single_timestamp(session, base_url, timestamp, results):
+async def get_codes_from_single_timestamp(session, base_url, timestamp, results, semaphore=asyncio.Semaphore(10)):
     """Returns UA/GA codes from a single archive.org snapshot and adds it to the results dictionary.
 
     Args:
@@ -128,13 +129,14 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
         base_url (str): Base url for archive.org snapshot.
         timestamp (str): 14-digit timestamp.
         results (dict): Dictionary to add codes to (inherited from get_codes_from_snapshots()).
+        semaphore: asyncio.Semaphore()
 
     Returns:
         None
     """
 
     # Use semaphore to limit number of concurrent requests
-    async with sem:
+    async with semaphore:
         async with session.get(
             base_url.format(timestamp=timestamp), headers=DEFAULT_HEADERS
         ) as response:

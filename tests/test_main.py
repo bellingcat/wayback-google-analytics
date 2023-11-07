@@ -89,6 +89,7 @@ class TestMain(unittest.TestCase):
             "daily",
             "--limit",
             "10",
+            "--skip_current",
         ]
         args = setup_args()
 
@@ -102,6 +103,7 @@ class TestMain(unittest.TestCase):
         self.assertEqual(args.end_date, "01/01/2013:12:00")
         self.assertEqual(args.frequency, "daily")
         self.assertEqual(args.limit, "10")
+        self.assertEqual(args.skip_current, True)
 
     def test_setup_args_valid_args_shorthand(self):
         """Does setup_args return args if valid args provided using shorthand commands?"""
@@ -120,6 +122,7 @@ class TestMain(unittest.TestCase):
             "daily",
             "-l",
             "10",
+            "-sc",
         ]
         args = setup_args()
 
@@ -133,3 +136,4 @@ class TestMain(unittest.TestCase):
         self.assertEqual(args.end_date, "01/01/2013:12:00")
         self.assertEqual(args.frequency, "daily")
         self.assertEqual(args.limit, "10")
+        self.assertEqual(args.skip_current, True)

@@ -62,15 +62,10 @@ class AsyncUtilsTestCase(asynctest.TestCase):
     @patch("wayback_google_analytics.async_utils.get_UA_code")
     @patch("wayback_google_analytics.async_utils.get_GA_code")
     @patch("wayback_google_analytics.async_utils.get_GTM_code")
-    @patch("wayback_google_analytics.async_utils.sem", new_callable=MagicMock())
     async def test_get_codes_from_single_timestamp(
-        self, mock_sem, mock_GTM, mock_GA, mock_UA, mock_get
+        self, mock_GTM, mock_GA, mock_UA, mock_get
     ):
         """Does get_codes_from_single_timestamp return correct codes from a single archive.org snapshot?"""
-
-        # Mock semaphore
-        mock_sem.__aenter__.return_value = MagicMock()
-        mock_sem.__aexit__.return_value = MagicMock()
 
         # Mock the response from the server
         mock_response = MagicMock()

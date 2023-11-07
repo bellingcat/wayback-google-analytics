@@ -202,7 +202,7 @@ You can also clone and download the repo from github and use the tool locally.
 
 3. Get a high-level overview:
     ```terminal
-    python main.py -h
+    python -m wayback_google_analytics.main.py -h
     ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

@@ -14,6 +14,7 @@ async def get_snapshot_timestamps(
     end_date,
     frequency,
     limit,
+    semaphore,
 ):
     """Takes a url and returns an array of snapshot timestamps for a given time range.
 
@@ -52,8 +53,9 @@ async def get_snapshot_timestamps(
     pattern = re.compile(r"\d{14}")
 
     # Use session to get timestamps
-    async with session.get(cdx_url, headers=DEFAULT_HEADERS) as response:
-        timestamps = pattern.findall(await response.text())
+    async with semaphore:
+        async with session.get(cdx_url, headers=DEFAULT_HEADERS) as response:
+            timestamps = pattern.findall(await response.text())
 
     print("Timestamps from CDX api: ", timestamps)
 
@@ -61,7 +63,7 @@ async def get_snapshot_timestamps(
     return sorted(timestamps)
 
 
-async def get_codes_from_snapshots(session, url, timestamps):
+async def get_codes_from_snapshots(session, url, timestamps, semaphore):
     """Returns an array of UA/GA codes for a given url using the Archive.org Wayback Machine.
 
     Args:
@@ -103,7 +105,7 @@ async def get_codes_from_snapshots(session, url, timestamps):
 
     # Get codes from each timestamp with asyncio.gather().
     tasks = [
-        get_codes_from_single_timestamp(session, base_url, timestamp, results)
+        get_codes_from_single_timestamp(session, base_url, timestamp, results, semaphore)
         for timestamp in timestamps
     ]
     await asyncio.gather(*tasks)
@@ -120,7 +122,7 @@ async def get_codes_from_snapshots(session, url, timestamps):
     return results
 
 
-async def get_codes_from_single_timestamp(session, base_url, timestamp, results):
+async def get_codes_from_single_timestamp(session, base_url, timestamp, results, semaphore):
     """Returns UA/GA codes from a single archive.org snapshot and adds it to the results dictionary.
 
     Args:
@@ -134,7 +136,7 @@ async def get_codes_from_single_timestamp(session, base_url, timestamp, results)
     """
 
     # Use semaphore to limit number of concurrent requests
-    async with sem:
+    async with semaphore:
         async with session.get(
             base_url.format(timestamp=timestamp), headers=DEFAULT_HEADERS
         ) as response:

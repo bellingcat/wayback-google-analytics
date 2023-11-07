@@ -66,16 +66,20 @@ async def main(args):
         )
         args.frequency = COLLAPSE_OPTIONS[args.frequency]
 
-    async with aiohttp.ClientSession() as session:
-        results = await get_analytics_codes(
-            session=session,
-            urls=args.urls,
-            start_date=args.start_date,
-            end_date=args.end_date,
-            frequency=args.frequency,
-            limit=args.limit,
-        )
-        print(results)
+    semaphore = asyncio.Semaphore(15)
+
+    async with semaphore:
+        async with aiohttp.ClientSession() as session:
+            results = await get_analytics_codes(
+                session=session,
+                urls=args.urls,
+                start_date=args.start_date,
+                end_date=args.end_date,
+                frequency=args.frequency,
+                limit=args.limit,
+                semaphore=semaphore,
+            )
+            print(results)
 
     # handle printing the output
     if args.output:
@@ -147,9 +151,11 @@ def setup_args():
 
     return parser.parse_args()
 
+
 def main_entrypoint():
     args = setup_args()
     asyncio.run(main(args))
+
 
 if __name__ == "__main__":
     main_entrypoint()

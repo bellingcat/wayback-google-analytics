@@ -136,3 +136,19 @@ def get_14_digit_timestamp(date):
 
     # Convert datetime object to 14-digit timestamp
     return date.strftime("%Y%m%d%H%M%S")
+
+def generate_semaphore(url_list, limit):
+    """Generates appropriate semaphore given a list of urls and a limit."""
+
+    url_count = len(url_list)
+
+    operations = url_count * limit
+
+    if operations <= 100:
+        return 10
+
+    if operations <= 1000:
+        return 5
+
+    if operations <= 10000:
+        return 1

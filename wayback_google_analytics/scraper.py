@@ -1,7 +1,5 @@
 import aiohttp
 import asyncio
-from aiohttp_retry import RetryClient, ExponentialRetry
-import backoff
 from wayback_google_analytics.codes import (
     get_UA_code,
     get_GA_code,
@@ -17,13 +15,13 @@ from wayback_google_analytics.utils import (
 )
 
 
-# @backoff.on_exception(backoff.expo, aiohttp.ClientConnectorError, max_tries=10)
 async def get_html(session, url, semaphore):
     """Returns html from a single url.
 
     Args:
         session (aiohttp.ClientSession)
         url (str): Url to scrape html from.
+        semaphore: asyncio.semaphore
 
     Returns:
         html (str): html from url.
@@ -41,7 +39,9 @@ async def get_html(session, url, semaphore):
             return None
 
 
-async def process_url(session, url, start_date, end_date, frequency, limit, semaphore):
+async def process_url(
+    session, url, start_date, end_date, frequency, limit, semaphore, skip_current
+):
     """Returns a dictionary of current and archived UA/GA codes for a single url.
 
     Args:
@@ -51,6 +51,8 @@ async def process_url(session, url, start_date, end_date, frequency, limit, sema
         end_date (str): End date for time range
         frequency (int):
         limit (int):
+        semaphore: asyncio.semaphore
+        skip_current (bool): Determine whether to skip getting current codes
 
     Returns:
         "someurl.com": {
@@ -82,14 +84,15 @@ async def process_url(session, url, start_date, end_date, frequency, limit, sema
         curr_entry = {url: {}}
 
         # Get html + current codes
-        html = await get_html(session, url, semaphore)
-        print("Retrieving current codes for: ", url)
-        if html:
-            curr_entry[url]["current_UA_code"] = get_UA_code(html)
-            curr_entry[url]["current_GA_code"] = get_GA_code(html)
-            curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
-            curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
-            print("Finished gathering current codes for: ", url)
+        if not skip_current:
+            html = await get_html(session, url, semaphore)
+            print("Retrieving current codes for: ", url)
+            if html:
+                curr_entry[url]["current_UA_code"] = get_UA_code(html)
+                curr_entry[url]["current_GA_code"] = get_GA_code(html)
+                curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
+                curr_entry[url]["current_GTM_code"] = get_GTM_code(html)
+                print("Finished gathering current codes for: ", url)
 
         # Get snapshots for Wayback Machine
         print("Retrieving archived codes for: ", url)
@@ -124,6 +127,7 @@ async def get_analytics_codes(
     frequency=None,
     limit=None,
     semaphore=None,
+    skip_current=False,
 ):
     """Takes array of urls and returns array of dictionaries with all found analytics codes for a given time range.
 
@@ -178,6 +182,7 @@ async def get_analytics_codes(
                 frequency=frequency,
                 limit=limit,
                 semaphore=semaphore,
+                skip_current=skip_current,
             )
         )
         tasks.append(task)

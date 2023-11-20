@@ -40,7 +40,7 @@ async def get_html(session, url, semaphore):
 
 
 async def process_url(
-    session, url, start_date, end_date, frequency, limit, semaphore, skip_current
+        session, url, start_date, end_date, frequency, limit, semaphore, skip_current
 ):
     """Returns a dictionary of current and archived UA/GA codes for a single url.
 
@@ -120,14 +120,14 @@ async def process_url(
 
 
 async def get_analytics_codes(
-    session,
-    urls,
-    start_date="20121001000000",
-    end_date=None,
-    frequency=None,
-    limit=None,
-    semaphore=None,
-    skip_current=False,
+        session,
+        urls,
+        start_date="20121001000000",
+        end_date=None,
+        frequency=None,
+        limit=None,
+        semaphore=None,
+        skip_current=False,
 ):
     """Takes array of urls and returns array of dictionaries with all found analytics codes for a given time range.
 
@@ -188,6 +188,4 @@ async def get_analytics_codes(
         tasks.append(task)
         await asyncio.sleep(5)
 
-    # Process urls concurrently and return results
-    results = await asyncio.gather(*tasks)
-    return results
+    return await asyncio.gather(*tasks)

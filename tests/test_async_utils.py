@@ -63,7 +63,7 @@ class AsyncUtilsTestCase(asynctest.TestCase):
     @patch("wayback_google_analytics.async_utils.get_GA_code")
     @patch("wayback_google_analytics.async_utils.get_GTM_code")
     async def test_get_codes_from_single_timestamp(
-        self, mock_GTM, mock_GA, mock_UA, mock_get
+            self, mock_GTM, mock_GA, mock_UA, mock_get
     ):
         """Does get_codes_from_single_timestamp return correct codes from a single archive.org snapshot?"""
 
@@ -114,8 +114,8 @@ class AsyncUtilsTestCase(asynctest.TestCase):
 
         """Does it call get_codes_from_single_timestamp for each timestamp?"""
         with asynctest.mock.patch(
-            "wayback_google_analytics.async_utils.get_codes_from_single_timestamp",
-            mock_get_codes_from_single_timestamp,
+                "wayback_google_analytics.async_utils.get_codes_from_single_timestamp",
+                mock_get_codes_from_single_timestamp,
         ):
             session = asynctest.Mock()
             url = "https://www.someurl.com"
@@ -141,8 +141,8 @@ class AsyncUtilsTestCase(asynctest.TestCase):
         mock_get_codes_from_single_timestamp = asynctest.CoroutineMock()
 
         with asynctest.mock.patch(
-            "wayback_google_analytics.async_utils.get_codes_from_single_timestamp",
-            mock_get_codes_from_single_timestamp,
+                "wayback_google_analytics.async_utils.get_codes_from_single_timestamp",
+                mock_get_codes_from_single_timestamp,
         ):
             session = asynctest.Mock()
             url = "https://www.someurl.com"
@@ -157,8 +157,8 @@ class AsyncUtilsTestCase(asynctest.TestCase):
         mock_get_codes_from_single_timestamp = asynctest.CoroutineMock()
 
         with asynctest.mock.patch(
-            "wayback_google_analytics.async_utils.get_codes_from_single_timestamp",
-            mock_get_codes_from_single_timestamp,
+                "wayback_google_analytics.async_utils.get_codes_from_single_timestamp",
+                mock_get_codes_from_single_timestamp,
         ):
             session = asynctest.Mock()
             url = "https://www.someurl.com"

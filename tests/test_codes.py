@@ -89,10 +89,9 @@ class CodesTestCase(TestCase):
 
         """Does it handle multiple UA codes in a single input?"""
         UA_codes = get_UA_code(self.test_html_2)
-        self.assertEqual(len(UA_codes), 3)
-        self.assertIn("UA-12345678-1", UA_codes)
-        self.assertIn("UA-12345678-2", UA_codes)
-        self.assertIn("UA-12345678", UA_codes)
+        self.assert_multiple_codes_found(
+            UA_codes, "UA-12345678-1", "UA-12345678-2", "UA-12345678"
+        )
 
     def test_get_UA_codes_invalid(self):
         """Test get_UA_code w/ invalid UA code"""
@@ -112,10 +111,9 @@ class CodesTestCase(TestCase):
 
         """Does it handle multiple GA codes in a single input?"""
         GA_codes = get_GA_code(self.test_html_2)
-        self.assertEqual(len(GA_codes), 3)
-        self.assertIn("G-12345678-1", GA_codes)
-        self.assertIn("G-12345678-2", GA_codes)
-        self.assertIn("G-12345678", GA_codes)
+        self.assert_multiple_codes_found(
+            GA_codes, "G-12345678-1", "G-12345678-2", "G-12345678"
+        )
 
     def test_get_GA_codes_invalid(self):
         """Test get_GA_code w/ invalid GA code"""
@@ -135,10 +133,15 @@ class CodesTestCase(TestCase):
 
         """Does it handle multiple GTM codes in a single input?"""
         GTM_codes = get_GTM_code(self.test_html_2)
-        self.assertEqual(len(GTM_codes), 3)
-        self.assertIn("GTM-23451", GTM_codes)
-        self.assertIn("GTM-2333234", GTM_codes)
-        self.assertIn("GTM-2124", GTM_codes)
+        self.assert_multiple_codes_found(
+            GTM_codes, "GTM-23451", "GTM-2333234", "GTM-2124"
+        )
+
+    def assert_multiple_codes_found(self, arg0, arg1, arg2, arg3):
+        self.assertEqual(len(arg0), 3)
+        self.assertIn(arg1, arg0)
+        self.assertIn(arg2, arg0)
+        self.assertIn(arg3, arg0)
 
     def test_get_GTM_codes_invalid(self):
         """Test get_GTM_code w/ invalid GTM code"""
@@ -146,5 +149,3 @@ class CodesTestCase(TestCase):
         """Does it return empty list if no GTM code is found?"""
         self.assertIsInstance(get_GTM_code(self.test_html_no_UA_code), list)
         self.assertEqual(len(get_GTM_code(self.test_html_no_UA_code)), 0)
-
-

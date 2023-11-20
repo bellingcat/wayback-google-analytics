@@ -1,5 +1,6 @@
-from bs4 import BeautifulSoup
 import re
+
+from bs4 import BeautifulSoup
 
 
 def get_UA_code(html):
@@ -24,7 +25,6 @@ def get_UA_code(html):
     for script in script_tags:
         curr_codes = pattern.findall(script.text)
         UA_codes += curr_codes
-
 
     # Remove duplicates and return
     return list(set(UA_codes))
@@ -78,7 +78,6 @@ def get_GTM_code(html):
     for script in script_tags:
         curr_codes = pattern.findall(script.text)
         GTM_codes += curr_codes
-
 
     # Remove duplicates and return
     return list(set(GTM_codes))

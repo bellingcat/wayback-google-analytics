@@ -124,32 +124,26 @@ class OutputTestCase(TestCase):
     def test_write_output_txt(self):
         """Does write_output write results to correct text file?"""
 
-        test_file = "./test_output/test_file.txt"
-        test_results = {"test": "test"}
-        with open(test_file, "w") as f:
-            pass
-
-        write_output(test_file, "txt", test_results)
-
-        with open(test_file, "r") as f:
-            test_data = json.load(f)
-
-        os.remove(test_file)
-        self.assertEqual(test_data, test_results)
+        self.assert_write_output_for_json_txt(
+            "./test_output/test_file.txt", "txt"
+        )
 
     def test_write_output_json(self):
         """Does write_output write results to correct json file?"""
 
-        test_file = "./test_output/test_file.json"
+        self.assert_write_output_for_json_txt(
+            "./test_output/test_file.json", "json"
+        )
+
+    # TODO Rename this here and in `test_write_output_txt` and `test_write_output_json`
+    def assert_write_output_for_json_txt(self, arg0, arg1):
+        test_file = arg0
         test_results = {"test": "test"}
         with open(test_file, "w") as f:
             pass
-
-        write_output(test_file, "json", test_results)
-
+        write_output(test_file, arg1, test_results)
         with open(test_file, "r") as f:
             test_data = json.load(f)
-
         os.remove(test_file)
         self.assertEqual(test_data, test_results)
 

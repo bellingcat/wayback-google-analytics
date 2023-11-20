@@ -43,9 +43,8 @@ async def main(args):
         output_file = init_output(args.output)
 
     # Check if start_date is before end_date
-    if args.start_date and args.end_date:
-        if not validate_dates(args.start_date, args.end_date):
-            raise ValueError("Start date must be before end date.")
+    if args.start_date and args.end_date and not validate_dates(args.start_date, args.end_date):
+        raise ValueError("Start date must be before end date.")
 
     # Update dates to 14-digit format
     if args.start_date:
@@ -57,12 +56,12 @@ async def main(args):
     # Gets appropriate limit for given frequency & converts frequency to collapse option
     if args.frequency:
         args.limit = (
-            get_limit_from_frequency(
-                frequency=args.frequency,
-                start_date=args.start_date,
-                end_date=args.end_date,
-            )
-            + 1
+                get_limit_from_frequency(
+                    frequency=args.frequency,
+                    start_date=args.start_date,
+                    end_date=args.end_date,
+                )
+                + 1
         )
         args.frequency = COLLAPSE_OPTIONS[args.frequency]
 

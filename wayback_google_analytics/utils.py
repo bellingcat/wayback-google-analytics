@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from dateutil.relativedelta import relativedelta
 
 # Default headers for requests
@@ -136,6 +137,7 @@ def get_14_digit_timestamp(date):
 
     # Convert datetime object to 14-digit timestamp
     return date.strftime("%Y%m%d%H%M%S")
+
 
 def generate_semaphore(url_list, limit):
     """Generates appropriate semaphore given a list of urls and a limit."""

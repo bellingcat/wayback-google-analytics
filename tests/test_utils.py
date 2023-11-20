@@ -1,6 +1,8 @@
 from unittest import TestCase
 
-from wayback_google_analytics.utils import get_limit_from_frequency, validate_dates, get_14_digit_timestamp, get_date_from_timestamp, COLLAPSE_OPTIONS
+from wayback_google_analytics.utils import get_limit_from_frequency, validate_dates, get_14_digit_timestamp, \
+    get_date_from_timestamp, COLLAPSE_OPTIONS
+
 
 class UtilsTestCase(TestCase):
     """Tests for utils.py"""
@@ -9,27 +11,43 @@ class UtilsTestCase(TestCase):
         """Tests that get_limit_from_frequency returns correct limit."""
 
         """Returns a correct limit for 'yearly' frequency."""
-        self.assertEqual(get_limit_from_frequency(frequency="yearly", start_date="20120101000000", end_date="20130101000000"), 2)
-        self.assertEqual(get_limit_from_frequency(frequency="yearly", start_date="20120101000000", end_date="20140101000000"), 3)
-        self.assertEqual(get_limit_from_frequency(frequency="yearly", start_date="19990101000000", end_date="20150101000000"), 17)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="yearly", start_date="20120101000000", end_date="20130101000000"), 2)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="yearly", start_date="20120101000000", end_date="20140101000000"), 3)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="yearly", start_date="19990101000000", end_date="20150101000000"), 17)
 
         """Returns a correct limit for 'monthly' frequency."""
-        self.assertEqual(get_limit_from_frequency(frequency="monthly", start_date="20120101000000", end_date="20120201000000"), 2)
-        self.assertEqual(get_limit_from_frequency(frequency="monthly", start_date="20120101000000", end_date="20121205000000"), 12)
-        self.assertEqual(get_limit_from_frequency(frequency="monthly", start_date="20120101000000", end_date="20130101000000"), 13)
-        self.assertEqual(get_limit_from_frequency(frequency="monthly", start_date="20120101000000", end_date="20140101000000"), 25)
-        self.assertEqual(get_limit_from_frequency(frequency="monthly", start_date="19990801000000", end_date="20150617000000"), 191)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="monthly", start_date="20120101000000", end_date="20120201000000"), 2)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="monthly", start_date="20120101000000", end_date="20121205000000"), 12)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="monthly", start_date="20120101000000", end_date="20130101000000"), 13)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="monthly", start_date="20120101000000", end_date="20140101000000"), 25)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="monthly", start_date="19990801000000", end_date="20150617000000"), 191)
 
         """Returns a correct limit for 'daily' frequency."""
-        self.assertEqual(get_limit_from_frequency(frequency="daily", start_date="20120101000000", end_date="20120102000000"), 2)
-        self.assertEqual(get_limit_from_frequency(frequency="daily", start_date="20120101000000", end_date="20120131000000"), 31)
-        self.assertEqual(get_limit_from_frequency(frequency="daily", start_date="19990213000000", end_date="20150617000000"), 5969)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="daily", start_date="20120101000000", end_date="20120102000000"), 2)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="daily", start_date="20120101000000", end_date="20120131000000"), 31)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="daily", start_date="19990213000000", end_date="20150617000000"), 5969)
 
         """Returns a correct limit for 'hourly' frequency."""
-        self.assertEqual(get_limit_from_frequency(frequency="hourly", start_date="20120101000000", end_date="20120101010000"), 2)
-        self.assertEqual(get_limit_from_frequency(frequency="hourly", start_date="20120101000000", end_date="20120101020000"), 3)
-        self.assertEqual(get_limit_from_frequency(frequency="hourly", start_date="20120101000000", end_date="20120101230000"), 24)
-        self.assertEqual(get_limit_from_frequency(frequency="hourly", start_date="19990213000000", end_date="20150617000000"), 143233)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="hourly", start_date="20120101000000", end_date="20120101010000"), 2)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="hourly", start_date="20120101000000", end_date="20120101020000"), 3)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="hourly", start_date="20120101000000", end_date="20120101230000"), 24)
+        self.assertEqual(
+            get_limit_from_frequency(frequency="hourly", start_date="19990213000000", end_date="20150617000000"),
+            143233)
 
     def test_get_limit_from_frequency_invalid(self):
         """Tests that get_limit_from_frequency raises ValueError if parameters incorrect."""
@@ -74,7 +92,6 @@ class UtilsTestCase(TestCase):
         with self.assertRaises(TypeError):
             validate_dates(start_date=None, end_date=None)
 
-
     def test_get_14_digit_timestamp(self):
         """Does get_14_digit_timestamp return correct timestamp?"""
 
@@ -82,7 +99,6 @@ class UtilsTestCase(TestCase):
         self.assertEqual(get_14_digit_timestamp("01/01/2012:12:00"), "20120101120000")
         self.assertEqual(get_14_digit_timestamp("01/01/2012:12:00"), "20120101120000")
         self.assertEqual(get_14_digit_timestamp("01/01/2012:23:01"), "20120101230100")
-
 
     def test_get_date_from_timestamp(self):
         """Does get_date_from_timestamp return correct date?"""
@@ -100,4 +116,3 @@ class UtilsTestCase(TestCase):
         self.assertEqual(COLLAPSE_OPTIONS["monthly"], "6")
         self.assertEqual(COLLAPSE_OPTIONS["daily"], "8")
         self.assertEqual(COLLAPSE_OPTIONS["hourly"], "10")
-

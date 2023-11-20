@@ -1,6 +1,7 @@
-from datetime import datetime
 import json
 import os
+from datetime import datetime
+
 import pandas as pd
 
 
@@ -58,7 +59,7 @@ def write_output(output_file, output_type, results):
     """
 
     # If json or txt, write contents directly to file.
-    if output_type == "json" or output_type == "txt":
+    if output_type in ["json", "txt"]:
         with open(output_file, "w") as f:
             json.dump(results, f, indent=4)
         return
@@ -94,25 +95,24 @@ def get_urls_df(results):
     url_list = []
 
     for item in results:
-        for url, info in item.items():
-            url_list.append(
-                {
-                    "url": url,
-                    "UA_Code": info.get("current_UA_code", ""),
-                    "GA_Code": info.get("current_GA_code", ""),
-                    "GTM_Code": info.get("current_GTM_code", ""),
-                    "Archived_UA_Codes": format_archived_codes(
-                        info.get("archived_UA_codes", {})
-                    ),
-                    "Archived_GA_Codes": format_archived_codes(
-                        info.get("archived_GA_codes", {})
-                    ),
-                    "Archived_GTM_Codes": format_archived_codes(
-                        info.get("archived_GTM_codes", {})
-                    ),
-                }
-            )
-
+        url_list.extend(
+            {
+                "url": url,
+                "UA_Code": info.get("current_UA_code", ""),
+                "GA_Code": info.get("current_GA_code", ""),
+                "GTM_Code": info.get("current_GTM_code", ""),
+                "Archived_UA_Codes": format_archived_codes(
+                    info.get("archived_UA_codes", {})
+                ),
+                "Archived_GA_Codes": format_archived_codes(
+                    info.get("archived_GA_codes", {})
+                ),
+                "Archived_GTM_Codes": format_archived_codes(
+                    info.get("archived_GTM_codes", {})
+                ),
+            }
+            for url, info in item.items()
+        )
     return pd.DataFrame(url_list)
 
 
@@ -127,15 +127,12 @@ def format_archived_codes(archived_codes):
         str: Formatted string.
     """
 
-    results = []
-    idx = 1
-
-    for code, timeframe in archived_codes.items():
-        results.append(
-            f"{idx}. {code} ({timeframe['first_seen']} - {timeframe['last_seen']})"
+    results = [
+        f"{idx}. {code} ({timeframe['first_seen']} - {timeframe['last_seen']})"
+        for idx, (code, timeframe) in enumerate(
+            archived_codes.items(), start=1
         )
-        idx += 1
-
+    ]
     return "\n\n".join(results)
 
 
@@ -157,24 +154,23 @@ def get_codes_df(results):
         for url, info in item.items():
             for key, code in info.items():
                 if type(code) is list:
-                    for c in code:
-                        code_list.append(
-                            {
-                                "code": c,
-                                "websites": url,
-                                "active": f"Current (at {url})",
-                            }
-                        )
+                    code_list.extend(
+                        {
+                            "code": c,
+                            "websites": url,
+                            "active": f"Current (at {url})",
+                        }
+                        for c in code
+                    )
                 if type(code) is dict:
-                    for c in code:
-                        code_list.append(
-                            {
-                                "code": c,
-                                "websites": url,
-                                "active": f"{code[c]['first_seen']} - {code[c]['last_seen']}(at {url})",
-                            }
-                        )
-
+                    code_list.extend(
+                        {
+                            "code": c,
+                            "websites": url,
+                            "active": f"{code[c]['first_seen']} - {code[c]['last_seen']}(at {url})",
+                        }
+                        for c in code
+                    )
     # Convert list of dicts to pandas dataframe
     codes_df = pd.DataFrame(code_list)
 

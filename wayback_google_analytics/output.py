@@ -175,6 +175,10 @@ def get_codes_df(results):
                             }
                         )
 
+    # Return a df w/ string message if no codes found
+    if not code_list:
+        return pd.DataFrame([{"Message": "No codes found."}])
+
     # Convert list of dicts to pandas dataframe
     codes_df = pd.DataFrame(code_list)
 

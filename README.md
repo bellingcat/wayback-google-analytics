@@ -1,23 +1,5 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+
 <a name="readme-top"></a>
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
-
-
-
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
@@ -100,6 +82,8 @@
 
 Wayback Google Analytics is a lightweight tool that gathers current and historic
 Google analytics data (UA, GA and GTM codes) from a collection of website urls.
+
+Read Bellingcat's article about using this tool to uncover disinformation networks online [here](https://www.bellingcat.com/resources/2024/01/09/using-the-wayback-machine-and-google-analytics-to-uncover-disinformation-networks/).
 
 ### Why do I need GA codes?
 
@@ -189,12 +173,12 @@ You can also clone and download the repo from github and use the tool locally.
 
 1. Clone repo:
     ```terminal
-    git clone git@github.com:jclark1913/osint-google-analytics.git
+    git clone git@github.com:bellingcat/wayback-google-analytics.git
     ```
 
 2. Navigate to root, create a venv and install requirements.txt:
     ```terminal
-    cd osint-google-analytics
+    cd wayback-google-analytics
     python -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt
@@ -202,7 +186,7 @@ You can also clone and download the repo from github and use the tool locally.
 
 3. Get a high-level overview:
     ```terminal
-    python -m wayback_google_analytics.main.py -h
+    python -m wayback_google_analytics.main -h
     ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

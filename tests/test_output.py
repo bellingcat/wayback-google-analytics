@@ -304,3 +304,15 @@ class OutputTestCase(TestCase):
 
         self.assertEqual(actual_results.to_dict(orient="records"), expected_results)
         self.assertTrue(type(actual_results) is pd.DataFrame)
+
+    def test_get_codes_df_empty_list(self):
+        """Does get_codes_df return a df with a message if codes_list is empty?"""
+
+        test_results = []
+        expected_results = pd.DataFrame({"Message": ["No codes found."]})
+
+        actual_results = get_codes_df(test_results)
+
+        self.assertEqual(actual_results.to_dict(orient="records"), expected_results.to_dict(orient="records"))
+        self.assertTrue(type(actual_results) is pd.DataFrame)
+

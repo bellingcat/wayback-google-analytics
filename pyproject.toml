@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wayback-google-analytics"
-version = "0.2.2"
+version = "0.2.3"
 description = "A tool for gathering current and historic google analytics ids from multiple websites"
 authors = ["Justin Clark <jclarksummit@gmail.com>"]
 license = "MIT"

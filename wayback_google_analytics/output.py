@@ -26,14 +26,14 @@ def init_output(type, output_dir="./output"):
         os.makedirs(output_dir)
 
     # Get current date and time for file name
-    file_name = datetime.now().strftime("%d-%m-%Y(%H:%M:%S)")
+    file_name = datetime.now().strftime("%d-%m-%Y(%H-%M-%S)")
 
     # Create empty output file if type is not csv and return filename
     if type not in ["csv"]:
         with open(os.path.join(f"{output_dir}", f"{file_name}.{type}"), "w") as f:
             pass
 
-        return f"{output_dir}/" + f"{file_name}.{type}"
+        return os.path.join(output_dir, f"{file_name}.{type}")
 
     # If csv, create separate files for urls and codes and return filename
     with open(os.path.join(f"{output_dir}", f"{file_name}_urls.{type}"), "w") as f:
@@ -42,7 +42,7 @@ def init_output(type, output_dir="./output"):
     with open(os.path.join(f"{output_dir}", f"{file_name}_codes.{type}"), "w") as f:
         pass
 
-    return f"{output_dir}/" + f"{file_name}.{type}"
+    return os.path.join(output_dir, f"{file_name}.{type}")
 
 
 def write_output(output_file, output_type, results):

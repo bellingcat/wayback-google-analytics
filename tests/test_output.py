@@ -21,7 +21,7 @@ class OutputTestCase(TestCase):
 
     def setUp(self):
         """Create test data"""
-        self.test_timestamp = "01-01-2023(12:00:00)"
+        self.test_timestamp = "01-01-2023(12-00-00)"
         self.test_path = "./test_output"
         self.valid_types = ["csv", "txt", "json", "xlsx"]
         if not os.path.exists(self.test_path):
@@ -76,7 +76,7 @@ class OutputTestCase(TestCase):
     def test_init_output_valid_types(self, mock_datetime):
         """Does init_output create a dict with correct keys?"""
         mock_now = Mock(
-            return_value=datetime.strptime(self.test_timestamp, "%d-%m-%Y(%H:%M:%S)")
+            return_value=datetime.strptime(self.test_timestamp, "%d-%m-%Y(%H-%M-%S)")
         )
         mock_datetime.now = mock_now
 
